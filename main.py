@@ -9,7 +9,7 @@ from sklearn.kernel_ridge import KernelRidge
 import dataset
 import ml
 
-
+print("Github Test")
 def debug(*args):
     print('\033[35m', *args, '\033[m', file=stderr)
 
