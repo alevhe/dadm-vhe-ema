@@ -145,9 +145,20 @@ def main(params_no=2,  limit=100000, show_stats=True, ts_size=0.33, folds=3, mon
     plt.xlabel("l")
     plt.ylabel("g")
     plt.show()
-#    plt.plot(gamm, list_1, color='b', linestyle='', marker=".", markersize="8")
- #   plt.plot(gamm, list_2, color='r', linestyle='', marker=".", markersize="8")
-  #  plt.show()
+    #plt.plot(gamm, list_1, color='b', linestyle='', marker=".", markersize="8")
+    #plt.plot(gamm, list_2, color='r', linestyle='', marker=".", markersize="8")
+    #plt.show()
+
+    print("LS RESULTS :")
+    print(ls_score)
+
+    print("RLS RESULTS :")
+    print(rls_score)
+
+    print("KRLS RESULTS :")
+    #print(krls_score)
+    print(krls_score.iloc[krls_score['mean_test_score'].idxmax()])
+
 
 if __name__ == '__main__':
     main(params_no=4, folds=2, limit=1000, montecarlo=1)
