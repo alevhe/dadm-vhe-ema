@@ -6,12 +6,28 @@ def swap(list, id1, id2):
     list[id2] = temp
 
 if __name__ == '__main__':
+
+    # Variable of the execution
     folder = "PlotData"
     ls_input = "LS-0.33-2.txt"
     rls_input = "RLS-0.33-2.txt"
     krls_input = "KRLS-0.33-2.txt"
-    limit_value = 0.7
 
+    #lower bound for the score when analyzing krls (because of the color scale)
+    limit_value_for_krls = 0.7
+
+    #limits for lambda (they allow to zoom areas)
+    rls_min_lambda = 0.0001
+    rls_max_lambda = 1000
+
+    #limits for gamma (they allow to zoom areas)
+    krls_min_lambda = 0.0001
+    krls_max_lambda = 1000
+    krls_min_gamma = 0.0001
+    krls_max_gamma = 1000
+
+    # LS algorithm
+    #open the selected file and read splitting on ;
     file_read = open(folder + "/" + ls_input, "r")
     input_data = file_read.read().split(";")
     file_read.close()
@@ -21,6 +37,7 @@ if __name__ == '__main__':
     train_score = list()
     test_score = list()
     for row in input_data:
+        #the last char in the file is ;
         if row == '':
             continue
         tu = row.split(",")
@@ -36,6 +53,9 @@ if __name__ == '__main__':
     plt.legend(frameon=False, loc='lower center')
     plt.show()
 
+
+    # RLS algorithm
+    #open the selected file and read splitting on ;
     file_read = open(folder + "/" + rls_input, "r")
     input_data = file_read.read().split(";")
     file_read.close()
@@ -44,12 +64,17 @@ if __name__ == '__main__':
     train_score = list()
     test_score = list()
     for row in input_data:
+        #the last char in the file is ;
         if row == '':
             continue
         tu = row.split(",")
-        alpha.append(float(tu[0]))
-        test_score.append(float(tu[1]))
-        train_score.append(float(tu[2]))
+        a = float(tu[0])
+        #select only the desired values of lambda
+        if rls_min_lambda <= a and rls_max_lambda >= a:
+            alpha.append(a)
+            test_score.append(float(tu[1]))
+            train_score.append(float(tu[2]))
+    #sort all the vectors by lambda (alpha)
     for id1 in range(len(alpha)-1):
         for id2 in range(id1+1, len(alpha)):
             if alpha[id2] < alpha[id1]:
@@ -67,6 +92,7 @@ if __name__ == '__main__':
             index += 1
         sum_train = 0
         sum_test = 0
+        #between start_index and index (both included) the values have same lambda => take the average
         for id1 in range(start_index, index+1):
             sum_train += train_score[id1]
             sum_test += test_score[id1]
@@ -82,6 +108,8 @@ if __name__ == '__main__':
     plt.xscale("log")
     plt.show()
 
+    # KRLS algorithm
+    # open the selected file and read splitting on ;
     file_read = open(folder + "/" + krls_input, "r")
     input_data = file_read.read().split(";")
     file_read.close()
@@ -92,31 +120,38 @@ if __name__ == '__main__':
     train_score_orig = list()
     test_score_orig = list()
     for row in input_data:
+        #the last char in the file is ;
         if row == '':
             continue
         tu = row.split(",")
-        kernel_orig.append(tu[0])
-        gamma_orig.append(float(tu[1]))
-        alpha_orig.append(float(tu[2]))
-        test_score_orig.append(float(tu[3]))
-        train_score_orig.append(float(tu[4]))
-
+        a = float(tu[2])
+        g = float(tu[1])
+        # select only the desired values of lambda and gamma
+        if krls_min_lambda <= a and krls_max_lambda >= a and krls_min_gamma <= g and krls_max_gamma >= g:
+            gamma_orig.append(g)
+            alpha_orig.append(a)
+            kernel_orig.append(tu[0])
+            test_score_orig.append(float(tu[3]))
+            train_score_orig.append(float(tu[4]))
+    #create the kernel list
     kernel_list = list()
     for ker in kernel_orig:
         if ker not in kernel_list:
             kernel_list.append(ker)
-
+    #analyze one by one all the kernels
     for kernel in kernel_list:
         alpha = list()
         gamma = list()
         train_score = list()
         test_score = list()
+        #look through all the data red by file and select those which have this kernel
         for value in range(len(kernel_orig)):
             if kernel_orig[value] == kernel:
                 alpha.append(alpha_orig[value])
                 gamma.append(gamma_orig[value])
                 train_score.append(train_score_orig[value])
                 test_score.append(test_score_orig[value])
+        #sort all the data whit this kernel by lambda
         for id1 in range(len(alpha) - 1):
             for id2 in range(id1 + 1, len(alpha)):
                 if alpha[id2] < alpha[id1]:
@@ -128,8 +163,10 @@ if __name__ == '__main__':
         while index < len(alpha) - 1:
             index += 1
             start_index = index
+            #all the elements between start_index and index (both inclusive) have the same labda
             while index < len(alpha) - 1 and alpha[index] == alpha[index + 1]:
                 index += 1
+            #sort those elements by gamma
             for id1 in range(start_index, index):
                 for id2 in range(id1 + 1, index + 1):
                     if gamma[id2] < gamma[id1]:
@@ -145,23 +182,29 @@ if __name__ == '__main__':
         while index < len(alpha) - 1:
             index += 1
             start_index = index
+            #all the elemnts between start_index and index have the same lambda and gamma
             while index < len(alpha) - 1 and alpha[index] == alpha[index + 1] and gamma[index] == gamma[index + 1]:
                 index += 1
             sum_train = 0
             sum_test = 0
+            #take the average of those elements
             for id1 in range(start_index, index + 1):
                 sum_train += train_score[id1]
                 sum_test += test_score[id1]
             train_value = sum_train / (index - start_index + 1)
             test_value = sum_test / (index - start_index + 1)
-            if train_value > limit_value:
+            #use only the values grater than limit_value_for_krls. In this way you can change the color scale
+            if train_value > limit_value_for_krls:
                 train.append(train_value)
             else:
-                train.append(limit_value)
-            if test_value > limit_value:
+                #if the value is lower, use the lower that you can use
+                train.append(limit_value_for_krls)
+            # use only the values grater than limit_value_for_krls. In this way you can change the color scale
+            if test_value > limit_value_for_krls:
                 test.append(test_value)
             else:
-                test.append(limit_value)
+                #if the value is lower, use the lower that you can use
+                test.append(limit_value_for_krls)
             x.append(alpha[index])
             y.append(gamma[index])
         cmap = plt.plasma()
