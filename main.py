@@ -34,8 +34,8 @@ def main(params_no=2,  limit=100000, show_stats=True, ts_size=0.33, folds=3, mon
                 'poly',
                 'laplacian'
             ],
-            'alpha': logspace(-3, 1, params_no),
-            'gamma': logspace(-3, 1, params_no)
+            'alpha': logspace(-3, -1, params_no),
+            'gamma': logspace(-3, -1, params_no)
         }
 
         debug('%d - Training LS...' % routine)
@@ -148,17 +148,23 @@ def main(params_no=2,  limit=100000, show_stats=True, ts_size=0.33, folds=3, mon
     #plt.plot(gamm, list_1, color='b', linestyle='', marker=".", markersize="8")
     #plt.plot(gamm, list_2, color='r', linestyle='', marker=".", markersize="8")
     #plt.show()
-
+    print(" ")
     print("LS RESULTS :")
-    print(ls_score)
+    #print(ls_score)
+    print(ls_score.rename(columns={'mean_test_score' : 'Mean Test Score', 'mean_train_score' : 'Mean Train Score'}).iloc[ls_score['mean_test_score'].idxmax()])
+    print(" ")
+
 
     print("RLS RESULTS :")
-    #print(rls_score)
-    print(rls_score.iloc[rls_score['mean_test_score'].idxmax()])
+    #print(rls_score.iloc[rls_score['mean_test_score'].idxmax()])
+    print(rls_score.rename(columns={'param_alpha' : 'Alpha', 'mean_test_score' : 'Mean Test Score', 'mean_train_score' : 'Mean Train Score'}).iloc[rls_score['mean_test_score'].idxmax()])
+    print(" ")
+
 
     print("KRLS RESULTS :")
     #print(krls_score)
-    print(krls_score.iloc[krls_score['mean_test_score'].idxmax()])
+    #print(krls_score.iloc[krls_score['mean_test_score'].idxmax()])
+    print(krls_score.rename(columns={'param_alpha' : 'Alpha', 'mean_test_score' : 'Mean Test Score', 'mean_train_score' : 'Mean Train Score', 'param_kernel' : 'Kernel', 'param_gamma' : 'Gamma'}).iloc[krls_score['mean_test_score'].idxmax()])
 
 
 if __name__ == '__main__':

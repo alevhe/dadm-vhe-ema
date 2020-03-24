@@ -2,9 +2,7 @@ Progetto DA&DM
 
 TODO LIST :
 
--Implementing normalization param
--Test on normalization
--Output structure and formatting
+-Test on normalization (Opt)
 
 
 Study List :
