@@ -11,12 +11,8 @@ def prepare_dataset(df, y_col, ts_size=0.33):
     x_first = df.loc[:, df.columns != y_col]
     y = df[y_col]
 
-    #dfn = normalize(x_first, axis=0)
-    #x = pd.DataFrame(dfn, columns=x_first.columns)
-
-    #t1 = x['bedrooms']
-    #t2 =[x*x for x in t1]
-    #t1 = sum(t2)
+#    dfn = normalize(x_first, axis=0)
+#    x = pd.DataFrame(dfn, columns=x_first.columns)
 
     val = x_first.values
     min_max_scaler = preprocessing.MinMaxScaler()

@@ -1,15 +1,12 @@
 from sys import stderr
 from numpy import logspace
 
-import pandas as pd
-import matplotlib.pylab as plt
-from mpl_toolkits import mplot3d
-
 from sklearn.linear_model import LinearRegression, Ridge
 from sklearn.kernel_ridge import KernelRidge
 
 import dataset
 import ml
+import PlotVisualization
 
 
 def debug(*args):
@@ -27,15 +24,15 @@ def main(params_no=2,  limit=100000, show_stats=True, ts_size=0.33, folds=3, mon
         debug('%d - Preparing dataset...' % routine)
         xtr, xts, ytr, yts = ml.prepare_dataset(df, 'SalePrice', ts_size=ts_size)
 
-        rls_params = {'alpha': logspace(-3, 1, params_no)}
+        rls_params = {'alpha': logspace(-4, 3, params_no)}
         krls_params = {
             'kernel': [
                 'rbf',
                 'poly',
                 'laplacian'
             ],
-            'alpha': logspace(-3, 1, params_no),
-            'gamma': logspace(-3, 1, params_no)
+            'alpha': logspace(-5, 1, params_no),
+            'gamma': logspace(-5, 1, params_no)
         }
 
         debug('%d - Training LS...' % routine)
@@ -63,91 +60,20 @@ def main(params_no=2,  limit=100000, show_stats=True, ts_size=0.33, folds=3, mon
             temp = krls_score.iloc[t][krls_score.columns]
             krls_results.append(temp)
 
-    lamb = list()
-    ine = 0
-    list_1 = list()
-    list_2 = list()
-    for tu in ls_results:
-        lamb.append(ine)
-        ine += 1
-        list_1.append(tu['mean_test_score'])
-        list_2.append(tu['mean_train_score'])
-    plt.plot(lamb, list_1, color='b', linestyle='', marker=".", markersize="8")
-    plt.plot(lamb, list_2, color='r', linestyle='', marker=".", markersize="8")
-    plt.show()
-
-    list_1 = list()
-    list_2 = list()
-    lamb = list()
-    for tu in rls_results:
-        lamb.append(tu['param_alpha'])
-        list_1.append(tu['mean_test_score'])
-        list_2.append(tu['mean_train_score'])
-    plt.plot(lamb, list_1, color='b', linestyle='', marker=".", markersize="8")
-    plt.plot(lamb, list_2, color='r', linestyle='', marker=".", markersize="8")
-    plt.show()
-
-    list_1 = list()
-    list_2 = list()
-    gamm = list()
-    lamb = list()
-    for tu in krls_results:
-        gamm.append(tu['param_gamma'])
-        lamb.append(tu['param_alpha'])
-        list_1.append(tu['mean_test_score'])
-        list_2.append(tu['mean_train_score'])
-    for index in range(len(lamb)-1):
-        if lamb[index+1] > lamb[index]:
-            temp = lamb[index+1]
-            lamb[index+1] = lamb[index]
-            lamb[index] = temp
-
-            temp = gamm[index + 1]
-            gamm[index + 1] = gamm[index]
-            gamm[index] = temp
-
-            temp = list_1[index + 1]
-            list_1[index + 1] = list_1[index]
-            list_1[index] = temp
-
-            temp = list_2[index + 1]
-            list_2[index + 1] = list_2[index]
-            list_2[index] = temp
-    fig = plt.figure()
-    ax = plt.axes(projection='3d')
-    for index in range(len(lamb)-1):
-        index_start = index
-        while lamb[index+1] == lamb[index]:
-            index += 1
-        lamb_a = list()
-        gamm_a = list()
-        list_a = list()
-        for ii in range(index_start, index):
-            lamb_a.append(lamb[ii])
-            gamm_a.append(gamm[ii])
-            list_a.append(list_1[ii])
-        for ii in range(len(lamb_a)-1):
-            if gamm_a[ii+1] > gamm_a[ii]:
-                temp = lamb_a[ii+1]
-                lamb_a[ii+1] = lamb_a[ii]
-                lamb_a[ii] = temp
-
-                temp = gamm_a[ii + 1]
-                gamm_a[ii + 1] = gamm_a[ii]
-                gamm_a[ii] = temp
-
-                temp = list_a[ii + 1]
-                list_a[ii + 1] = list_a[ii]
-                list_a[ii] = temp
-
-        ax.plot3D(lamb_a, gamm_a, list_a, 'gray')
-
-    plt.xlabel("l")
-    plt.ylabel("g")
-    plt.show()
-    #plt.plot(gamm, list_1, color='b', linestyle='', marker=".", markersize="8")
-    #plt.plot(gamm, list_2, color='r', linestyle='', marker=".", markersize="8")
-    #plt.show()
+    file_1 = open("PlotData/" + "LS-" + str(ts_size) + "-" + str(folds) + ".txt", "a")
+    for tt in ls_results:
+        file_1.write(str(tt['mean_test_score']) + "," + str(tt['mean_train_score']) + ";")
+    file_1.close()
+    file_2 = open("PlotData/" + "RLS-" + str(ts_size) + "-" + str(folds) + ".txt", "a")
+    for tt in rls_results:
+        file_2.write(
+            str(tt['param_alpha']) + "," + str(tt['mean_test_score']) + "," + str(tt['mean_train_score']) + ";")
+    file_2.close()
+    file_3 = open("PlotData/" + "KRLS-" + str(ts_size) + "-" + str(folds) + ".txt", "a")
+    for tt in krls_results:
+        file_3.write(tt['param_kernel'] + "," + str(tt['param_gamma']) + "," + str(tt['param_alpha']) + "," + str(
+                tt['mean_test_score']) + "," + str(tt['mean_train_score']) + ";")
+    file_3.close()
 
     print("LS RESULTS :")
     print(ls_score)
@@ -162,4 +88,4 @@ def main(params_no=2,  limit=100000, show_stats=True, ts_size=0.33, folds=3, mon
 
 
 if __name__ == '__main__':
-    main(params_no=4, folds=2, limit=1000, montecarlo=1)
+    main(params_no=8, folds=2, limit=1000, montecarlo=1)
