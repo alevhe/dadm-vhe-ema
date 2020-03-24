@@ -4,7 +4,7 @@ from numpy import logspace
 from sklearn.linear_model import LinearRegression, Ridge
 from sklearn.kernel_ridge import KernelRidge
 
-import dataset
+import DatasetPreparation
 import ml
 import PlotVisualization
 
@@ -19,7 +19,7 @@ def main(params_no=2,  limit=100000, show_stats=True, ts_size=0.33, folds=3, mon
     krls_results = list()
     for routine in range(montecarlo):
         debug('%d - Reading dataset...' % routine)
-        df = dataset._read_file().iloc[:limit]
+        df = DatasetPreparation._read_file().iloc[:limit]
 
         debug('%d - Preparing dataset...' % routine)
         xtr, xts, ytr, yts = ml.prepare_dataset(df, 'SalePrice', ts_size=ts_size)

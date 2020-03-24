@@ -1,6 +1,6 @@
 import pandas as pd
 
-def _read_file(filename='data/train.csv'):
+def _read_file(filename):
     df = pd.read_csv(filename)
     df = df.drop('Id', axis=1)
     MSZonind =  {'A': 0, 'C (all)': 1, 'C': 1, 'FV': 2, 'I': 3, 'RH': 4, 'RL': 5, 'RP': 6, 'RM': 7}

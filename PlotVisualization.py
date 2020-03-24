@@ -26,6 +26,9 @@ if __name__ == '__main__':
     krls_min_gamma = 0.0001
     krls_max_gamma = 1000
 
+    #color map for the kernel plots
+    cmap = plt.plasma()
+
     # LS algorithm
     #open the selected file and read splitting on ;
     file_read = open(folder + "/" + ls_input, "r")
@@ -138,13 +141,15 @@ if __name__ == '__main__':
     for ker in kernel_orig:
         if ker not in kernel_list:
             kernel_list.append(ker)
+    #index of the plot
+    plot_index = 0
     #analyze one by one all the kernels
     for kernel in kernel_list:
         alpha = list()
         gamma = list()
         train_score = list()
         test_score = list()
-        #look through all the data red by file and select those which have this kernel
+        #look through all the data read by file and select those which have this kernel
         for value in range(len(kernel_orig)):
             if kernel_orig[value] == kernel:
                 alpha.append(alpha_orig[value])
@@ -207,22 +212,25 @@ if __name__ == '__main__':
                 test.append(limit_value_for_krls)
             x.append(alpha[index])
             y.append(gamma[index])
-        cmap = plt.plasma()
-        f, ax = plt.subplots()
-        ax.set_title("KRLS results - "+kernel+" - Mean Test Score")
-        ax.set_ylabel('gamma')
-        ax.set_xlabel('lambda')
-        points = ax.scatter(x, y, c=test, s=50, cmap=cmap)
-        f.colorbar(points)
+        plot_index += 1
+        plt.subplot(len(kernel_list), 2, plot_index)
+        #f, ax = plt.subplots()
+        plt.title(kernel+" - Test")
+        plt.ylabel('gamma')
+        plt.xlabel('lambda')
+        points = plt.scatter(x, y, c=test, s=10, cmap=cmap)
+        plt.colorbar(points)
         plt.yscale("log")
         plt.xscale("log")
-        plt.show()
-        f, ax = plt.subplots()
-        ax.set_title("KRLS results - "+kernel+" - Mean Train Score")
-        ax.set_ylabel('gamma')
-        ax.set_xlabel('lambda')
-        points = ax.scatter(x, y, c=train, s=50, cmap=cmap)
-        f.colorbar(points)
+
+        plot_index += 1
+        plt.subplot(len(kernel_list), 2, plot_index)
+        #f, ax = plt.subplots()
+        plt.title(kernel+" - Train")
+        plt.ylabel('gamma')
+        plt.xlabel('lambda')
+        points = plt.scatter(x, y, c=train, s=10, cmap=cmap)
+        plt.colorbar(points)
         plt.yscale("log")
         plt.xscale("log")
-        plt.show()
+    plt.show()
