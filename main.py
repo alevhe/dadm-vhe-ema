@@ -153,7 +153,8 @@ def main(params_no=2,  limit=100000, show_stats=True, ts_size=0.33, folds=3, mon
     print(ls_score)
 
     print("RLS RESULTS :")
-    print(rls_score)
+    #print(rls_score)
+    print(rls_score.iloc[rls_score['mean_test_score'].idxmax()])
 
     print("KRLS RESULTS :")
     #print(krls_score)
