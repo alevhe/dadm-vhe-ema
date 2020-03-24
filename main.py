@@ -22,10 +22,10 @@ def main(params_no=2,  limit=100000, show_stats=True, ts_size=0.33, folds=3, mon
     krls_results = list()
     for routine in range(montecarlo):
         debug('%d - Reading dataset...' % routine)
-        df = dataset.get_dataset().iloc[:limit]
+        df = dataset._read_file().iloc[:limit]
 
         debug('%d - Preparing dataset...' % routine)
-        xtr, xts, ytr, yts = ml.prepare_dataset(df, 'price', ts_size=ts_size)
+        xtr, xts, ytr, yts = ml.prepare_dataset(df, 'SalePrice', ts_size=ts_size)
 
         rls_params = {'alpha': logspace(-3, 1, params_no)}
         krls_params = {
