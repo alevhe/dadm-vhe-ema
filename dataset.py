@@ -4,21 +4,12 @@ import dateutil.parser
 
 def _read_file(filename):
     df = pd.read_csv(filename)
-
-    df = df.drop('id', axis=1)
-
+    df = df.drop('Id', axis=1)
     return df
 
-
 def _split_dates(df):
-    dates = df['date'].apply(dateutil.parser.parse)
-
-    df['year'] = dates.apply(lambda d: d.year)
-    df['month'] = dates.apply(lambda d: d.month)
-    df['day'] = dates.apply(lambda d: d.day)
-
-    df = df.drop('date', axis=1)
-
+    MSZonind_dict =  {'A': 0, 'C (all)': 1, 'C': 1, 'FV': 2, 'I': 3, 'RH': 4, 'RL': 5, 'RP': 6, 'RM': 7}
+    df['MSZoning'] = df['MSZoning'].replace(to_replace=MSZonind_dict)
     return df
 
 
@@ -32,7 +23,7 @@ def _zip_encode(df):
     return df
 
 
-def get_dataset(filename='data/kc_house_data.csv'):
+def get_dataset(filename='data/train.csv'):
     df = _read_file(filename)
 
     df = _split_dates(df)
