@@ -23,7 +23,6 @@ def train_estimator(estimator, xtr, ytr, params, folds):
 
 
 def test_estimator(clf, xts, yts):
-    predict= clf.predict(xts)
     df = pd.DataFrame(clf.cv_results_)
     df = df.filter(regex='^mean.*score$|^param_')
     RESU = [clf.score(xts, yts), clf.best_params_]
