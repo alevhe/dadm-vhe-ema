@@ -235,6 +235,4 @@ def _read_file(filename):
     df['SaleCondition'] = df['SaleCondition'].replace(to_replace=SaleCondition)
     MiscFeature = {None: 0, 'Elev': 1, 'Gar2': 2, 'Othr': 3, 'Shed': 4, 'TenC': 5}
     df['MiscFeature'] = df['MiscFeature'].replace(to_replace=MiscFeature)
-
-    df1 = df[df.isna().any(axis=1)]
     return df

@@ -53,11 +53,20 @@ if __name__ == '__main__':
         rls = Estimator.train_estimator(Ridge(solver='auto'), xtr, ytr, rls_params, folds=folds)
         rls_result = rls.predict(test)
     if withKRLS:
+        print("Training KRLS...")
         krls_params = {
             'kernel': kernel_list,
             'alpha': logspace(krls_min_lambda, krls_max_lambda, krls_n_lambda_to_try),
             'gamma': logspace(krls_min_gamma, krls_max_gamma, krls_n_gamma_to_try)
         }
-        ls = Estimator.train_estimator(LinearRegression(), xtr, ytr, params={}, folds=folds)
         krls = Estimator.train_estimator(KernelRidge(), xtr, ytr, krls_params, folds=folds)
-        krl_result = krls.predict(test)
+        print("Predicting KRLS...")
+        krls_result = krls.predict(test)
+        print("Predicted")
+        #DataFrame construction for Kaggle
+        file_output = open("Output/output.csv", "w")
+        file_output.write("Id,SalePrice\n")
+        for res in range(len(krls_result)):
+            file_output.write(str(1461+res)+","+str(krls_result[res])+"\n")
+        file_output.close()
+    print("HELLOOOO")
