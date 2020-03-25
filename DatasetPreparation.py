@@ -4,35 +4,56 @@ def _read_file(filename):
     df = pd.read_csv(filename)
     df = df.drop('Id', axis=1)
 
+    #TODO ESEMPIO di sostituzione con media
     MSZonind =  {'A': 1, 'C (all)': 2, 'C': 2, 'FV': 3, 'I': 4, 'RH': 5, 'RL': 6, 'RP': 7, 'RM': 8}
     df['MSZoning'] = df['MSZoning'].replace(to_replace=MSZonind)
     sum_list = [x for x in df['MSZoning'] if str(x) != 'nan']
     MSZonind = {None: sum(sum_list)/len(sum_list)}
     df['MSZoning'] = df['MSZoning'].replace(to_replace=MSZonind)
 
-    GarageCars ={None: 0}
-    GarageArea = {None: 0}
-    GarageQual = {None: 0, 'Po': 1, 'Fa': 2, 'TA': 3, 'Gd': 4, 'Ex': 5}
+    GarageAreaArray = df['GarageArea']
+    sum_not_nan = [x for x in range(len(GarageAreaArray)) if str(GarageAreaArray[x]) == 'nan']
+
+    #TODO ESEMPIO di sostituzione con media condizionata ai nan di GarageArea
+    GarageQual = {'Po': 1, 'Fa': 2, 'TA': 3, 'Gd': 4, 'Ex': 5}
     df['GarageQual'] = df['GarageQual'].replace(to_replace=GarageQual)
-    GarageYrBlt = {None: 0}
+    sum_list = [x for x in df['GarageQual'] if str(x) != 'nan']
+    df['GarageQual'][sum_not_nan] =  sum(sum_list) / len(sum_list)
+    GarageQual = {None: 0}
+    df['GarageQual'] = df['GarageQual'].replace(to_replace=GarageQual)
+
+    GarageYrBlt = {None: 0}  #TODO media condizionata
     df['GarageYrBlt'] = df['GarageYrBlt'].replace(to_replace=GarageYrBlt)
-    GarageCond = {None: 0, 'Po': 1, 'Fa': 2, 'TA': 3, 'Gd': 4, 'Ex': 5}
+
+    GarageCond = {None: 0, 'Po': 1, 'Fa': 2, 'TA': 3, 'Gd': 4, 'Ex': 5}  #TODO media condizionata
     df['GarageCond'] = df['GarageCond'].replace(to_replace=GarageCond)
-    GarageFinish = {None: 0, 'Unf': 1, 'RFn': 2, 'Fin': 3}
+
+    GarageFinish = {None: 0, 'Unf': 1, 'RFn': 2, 'Fin': 3}  #TODO media condizionata
     df['GarageFinish'] = df['GarageFinish'].replace(to_replace=GarageFinish)
-    GarageType = {None: 0, 'Detchd': 1, 'CarPort': 2, 'BuiltIn': 3, "Basment": 4, 'Attchd': 5, "2Types": 6}
+
+    GarageType = {None: 0, 'Detchd': 1, 'CarPort': 2, 'BuiltIn': 3, "Basment": 4, 'Attchd': 5,
+                  "2Types": 6}  #TODO media condizionata
     df['GarageType'] = df['GarageType'].replace(to_replace=GarageType)
+
+    sum_list = [x for x in df['GarageCars'] if str(x) != 'nan']
+    GarageCars = {None: sum(sum_list)/len(sum_list)}
+    df['GarageCars'] = df['GarageCars'].replace(to_replace=GarageCars)
+
+    sum_list = [x for x in df['GarageArea'] if str(x) != 'nan']
+    GarageArea = {None: sum(sum_list)/len(sum_list)}
+    df['GarageArea'] = df['GarageArea'].replace(to_replace=GarageArea)
+
     FireplaceQu = {None: 0, 'Po': 1, 'Fa': 2, 'TA': 3, 'Gd': 4, 'Ex': 5}
     df['FireplaceQu'] = df['FireplaceQu'].replace(to_replace=FireplaceQu)
     Functional = {'Sal': 0, "Sev": 1, 'Maj2': 2, 'Maj1': 3, 'Mod': 4, 'Min2': 5, 'Min1': 6, 'Typ': 7}
     df['Functional'] = df['Functional'].replace(to_replace=Functional)
-    KitchenQual = {None: 0, 'Po': 1, 'Fa': 2, 'TA': 3, 'Gd': 4, 'Ex': 5}
+    KitchenQual = {None: 0, 'Po': 1, 'Fa': 2, 'TA': 3, 'Gd': 4, 'Ex': 5} #TODO media
     df['KitchenQual'] = df['KitchenQual'].replace(to_replace=KitchenQual)
     Electrical = {'Mix': 0, 'FuseP': 1, 'FuseF': 2, 'FuseA': 3, 'SBrkr': 4}
     df['Electrical'] = df['Electrical'].replace(to_replace=Electrical)
     CentralAir = {'N': 0, 'Y': 1}
     df['CentralAir'] = df['CentralAir'].replace(to_replace=CentralAir)
-    HeatingQC = {None: 0, 'Po': 1, 'Fa': 2, 'TA': 3, 'Gd': 4, 'Ex': 5}
+    HeatingQC = {'Po': 1, 'Fa': 2, 'TA': 3, 'Gd': 4, 'Ex': 5}
     df['HeatingQC'] = df['HeatingQC'].replace(to_replace=HeatingQC)
     Heating = {'Floor': 0, 'GasA': 1, 'GasW': 2, 'Grav': 3, 'OthW': 4, 'Wall': 5}
     df['Heating'] = df['Heating'].replace(to_replace=Heating)
@@ -90,27 +111,27 @@ def _read_file(filename):
     df['RoofMatl'] = df['RoofMatl'].replace(to_replace=RoofMatl)
     Exterior1st = {None: 17, 'AsbShng': 0, 'AsphShn': 1, 'BrkComm': 2, 'BrkFace': 3, 'CBlock': 4, 'CemntBd': 5, 'HdBoard': 6,
                         'ImStucc': 7, 'MetalSd': 8, 'Other': 9, 'Plywood': 10, 'PreCast': 11, 'Stone': 12, 'Stucco': 13,
-                        'VinylSd': 14, 'Wd Sdng': 15, 'WdShing': 16}
+                        'VinylSd': 14, 'Wd Sdng': 15, 'WdShing': 16} #TODO media
     df['Exterior1st'] = df['Exterior1st'].replace(to_replace=Exterior1st)
     Exterior2nd = {None: 17, 'AsbShng': 0, 'AsphShn': 1, 'Brk Cmn': 2, 'BrkFace': 3, 'CBlock': 4, 'CmentBd': 5, 'HdBoard': 6,
                         'ImStucc': 7, 'MetalSd': 8, 'Other': 9, 'Plywood': 10, 'PreCast': 11, 'Stone': 12, 'Stucco': 13,
-                        'VinylSd': 14, 'Wd Sdng': 15, 'Wd Shng': 16}
-    df['Exterior2nd'] = df['Exterior2nd'].replace(to_replace=Exterior2nd)
-    MasVnrType = {None: 0, 'BrkCmn': 1, 'BrkFace': 2, 'CBlock': 3, 'None': 4, 'Stone': 5}
+                        'VinylSd': 14, 'Wd Sdng': 15, 'Wd Shng': 16} #TODO media
+    df['Exterior2nd'] = df['Exterior2nd'].replace(to_replace=Exterior2nd) #TODO media
+    MasVnrType = {None: 0, 'BrkCmn': 1, 'BrkFace': 2, 'CBlock': 3, 'None': 4, 'Stone': 5}#
     df['MasVnrType'] = df['MasVnrType'].replace(to_replace=MasVnrType)
-    MasVnrArea = {None: 0}
+    MasVnrArea = {None: 0} #TODO media
     df['MasVnrArea'] = df['MasVnrArea'].replace(to_replace=MasVnrArea)
     ExterQual = {None: 0, 'Po': 1, 'Fa': 2, 'TA': 3, 'Gd': 4, 'Ex': 5}
-    df['ExterQual'] = df['ExterQual'].replace(to_replace=ExterQual)
+    df['ExterQual'] = df['ExterQual'].replace(to_replace=ExterQual) #TODO media
     ExterCond = {None: 0, 'Po': 1, 'Fa': 2, 'TA': 3, 'Gd': 4, 'Ex': 5}
-    df['ExterCond'] = df['ExterCond'].replace(to_replace=ExterCond)
+    df['ExterCond'] = df['ExterCond'].replace(to_replace=ExterCond) #TODO media
 
-    PoolQC = {None: 0, 'Po': 1, 'Fa': 2, 'TA': 3, 'Gd': 4, 'Ex': 5}
+    PoolQC = {None: 0, 'Po': 1, 'Fa': 2, 'TA': 3, 'Gd': 4, 'Ex': 5} #TODO media solo dove PoolArea != 0
     df['PoolQC'] = df['PoolQC'].replace(to_replace=PoolQC)
     Fence = {None: 0, 'MnWw': 1, 'GdWo': 2, 'MnPrv': 3, 'GdPrv': 4}
     df['Fence'] = df['Fence'].replace(to_replace=Fence)
-    SaleType = {None: 0, 'WD': 1, 'CWD': 2, 'VWD': 3, 'New': 4, 'COD': 5, 'Con': 6, 'ConLw': 7, 'ConLI': 8, 'ConLD': 9,
-                'Oth': 10}
+    SaleType = {'WD': 1, 'CWD': 2, 'VWD': 3, 'New': 4, 'COD': 5, 'Con': 6, 'ConLw': 7, 'ConLI': 8, 'ConLD': 9,
+                'Oth': 10} #TODO removed
     df['SaleType'] = df['SaleType'].replace(to_replace=SaleType)
     SaleCondition = {'Normal': 0, 'Abnorml': 1, 'AdjLand': 2, 'Alloca': 3, 'Family': 4, 'Partial': 5}
     df['SaleCondition'] = df['SaleCondition'].replace(to_replace=SaleCondition)
