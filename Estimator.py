@@ -1,5 +1,5 @@
 import pandas as pd
-
+import numpy as np
 from sklearn.model_selection import train_test_split, GridSearchCV, KFold
 from sklearn import preprocessing
 
@@ -18,6 +18,8 @@ def normalize_set(df, y_col, ts_size):
 def train_estimator(estimator, xtr, ytr, params, folds):
     cv = KFold(n_splits=folds)
     clf = GridSearchCV(estimator, params, cv=cv, return_train_score=True, n_jobs=4)
+    # the following line finds all the cuples of indexes where isnan
+    #[i,j] = np.where(np.isnan(xtr))
     clf.fit(xtr, ytr)
     return clf
 

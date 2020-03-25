@@ -98,6 +98,10 @@ def _read_file(filename):
 
     Electrical = {'Mix': 0, 'FuseP': 1, 'FuseF': 2, 'FuseA': 3, 'SBrkr': 4}
     df['Electrical'] = df['Electrical'].replace(to_replace=Electrical)
+    sum_list = [x for x in df['Electrical'] if str(x) != 'nan']
+    Electrical = {None: sum(sum_list) / len(sum_list)}
+    df['Electrical'] = df['Electrical'].replace(to_replace=Electrical)
+
     CentralAir = {'N': 0, 'Y': 1}
     df['CentralAir'] = df['CentralAir'].replace(to_replace=CentralAir)
     HeatingQC = {'Po': 1, 'Fa': 2, 'TA': 3, 'Gd': 4, 'Ex': 5}
