@@ -68,8 +68,13 @@ def _read_file(filename):
 
     FireplaceQu = {None: 0, 'Po': 1, 'Fa': 2, 'TA': 3, 'Gd': 4, 'Ex': 5}
     df['FireplaceQu'] = df['FireplaceQu'].replace(to_replace=FireplaceQu)
+
+    #TODO Media
     Functional = {'Sal': 0, "Sev": 1, 'Maj2': 2, 'Maj1': 3, 'Mod': 4, 'Min2': 5, 'Min1': 6, 'Typ': 7}
     df['Functional'] = df['Functional'].replace(to_replace=Functional)
+    sum_list = [x for x in df['Functional'] if str(x) != 'nan']
+    ExterCond = {None: sum(sum_list) / len(sum_list)}
+    df['Functional'] = df['Functional'].replace(to_replace=ExterCond)
 
     BsmtFinSF1 = {None: 0}
     df['BsmtFinSF1'] = df['BsmtFinSF1'].replace(to_replace=BsmtFinSF1)
@@ -226,4 +231,6 @@ def _read_file(filename):
     df['SaleCondition'] = df['SaleCondition'].replace(to_replace=SaleCondition)
     MiscFeature = {None: 0, 'Elev': 1, 'Gar2': 2, 'Othr': 3, 'Shed': 4, 'TenC': 5}
     df['MiscFeature'] = df['MiscFeature'].replace(to_replace=MiscFeature)
+
+    df1 = df[df.isna().any(axis=1)]
     return df
