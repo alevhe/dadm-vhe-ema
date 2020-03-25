@@ -13,7 +13,7 @@ if __name__ == '__main__':
     test_filename = 'data/test.csv'  # name of the fail to be trained
     y_column = 'SalePrice' #label of the results column
     withLS = False
-    withRLS = True
+    withRLS = False
     withKRLS = True
     folds = 3
     rls_n_lambda_to_try = 8  # number of lambda to try
@@ -29,13 +29,13 @@ if __name__ == '__main__':
 
     #read the dataset only the first time (I doesn't change)
     print('Reading dataset...')
-    input = DatasetPreparation._read_file(input_filename)
     test = DatasetPreparation._read_file(test_filename)
-    # obtain 4 different matrix (x-train, x-test, y-train, y-test)
-    xtr = input.loc[:, input.columns != y_column]
-    ytr = input[y_column]
 
-    val = xtr.values
+    df = DatasetPreparation._read_file(input_filename)
+
+    x_first = df.loc[:, df.columns != y_column]
+    ytr = df[y_column]
+    val = x_first.values
     min_max_scaler = preprocessing.MinMaxScaler()
     x_scaled = min_max_scaler.fit_transform(val)
     xtr = pd.DataFrame(x_scaled)

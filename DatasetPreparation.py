@@ -3,8 +3,15 @@ import pandas as pd
 def _read_file(filename):
     df = pd.read_csv(filename)
     df = df.drop('Id', axis=1)
-    MSZonind =  {'A': 0, 'C (all)': 1, 'C': 1, 'FV': 2, 'I': 3, 'RH': 4, 'RL': 5, 'RP': 6, 'RM': 7}
+
+    MSZonind =  {'A': 1, 'C (all)': 2, 'C': 2, 'FV': 3, 'I': 4, 'RH': 5, 'RL': 6, 'RP': 7, 'RM': 8}
     df['MSZoning'] = df['MSZoning'].replace(to_replace=MSZonind)
+    sum_list = [x for x in df['MSZoning'] if str(x) != 'nan']
+    MSZonind = {None: sum(sum_list)/len(sum_list)}
+    df['MSZoning'] = df['MSZoning'].replace(to_replace=MSZonind)
+
+    GarageCars ={None: 0}
+    GarageArea = {None: 0}
     GarageQual = {None: 0, 'Po': 1, 'Fa': 2, 'TA': 3, 'Gd': 4, 'Ex': 5}
     df['GarageQual'] = df['GarageQual'].replace(to_replace=GarageQual)
     GarageYrBlt = {None: 0}
@@ -81,11 +88,11 @@ def _read_file(filename):
     RoofMatl = {'ClyTile': 0, 'CompShg': 1, 'Membran': 2, 'Metal': 3, 'Roll': 4, 'Tar&Grv': 5, 'WdShake': 6,
                      'WdShngl': 7}
     df['RoofMatl'] = df['RoofMatl'].replace(to_replace=RoofMatl)
-    Exterior1st = {'AsbShng': 0, 'AsphShn': 1, 'BrkComm': 2, 'BrkFace': 3, 'CBlock': 4, 'CemntBd': 5, 'HdBoard': 6,
+    Exterior1st = {None: 17, 'AsbShng': 0, 'AsphShn': 1, 'BrkComm': 2, 'BrkFace': 3, 'CBlock': 4, 'CemntBd': 5, 'HdBoard': 6,
                         'ImStucc': 7, 'MetalSd': 8, 'Other': 9, 'Plywood': 10, 'PreCast': 11, 'Stone': 12, 'Stucco': 13,
                         'VinylSd': 14, 'Wd Sdng': 15, 'WdShing': 16}
     df['Exterior1st'] = df['Exterior1st'].replace(to_replace=Exterior1st)
-    Exterior2nd = {'AsbShng': 0, 'AsphShn': 1, 'Brk Cmn': 2, 'BrkFace': 3, 'CBlock': 4, 'CmentBd': 5, 'HdBoard': 6,
+    Exterior2nd = {None: 17, 'AsbShng': 0, 'AsphShn': 1, 'Brk Cmn': 2, 'BrkFace': 3, 'CBlock': 4, 'CmentBd': 5, 'HdBoard': 6,
                         'ImStucc': 7, 'MetalSd': 8, 'Other': 9, 'Plywood': 10, 'PreCast': 11, 'Stone': 12, 'Stucco': 13,
                         'VinylSd': 14, 'Wd Sdng': 15, 'Wd Shng': 16}
     df['Exterior2nd'] = df['Exterior2nd'].replace(to_replace=Exterior2nd)
