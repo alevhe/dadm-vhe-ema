@@ -6,7 +6,7 @@ from sklearn.linear_model import LinearRegression, Ridge
 from sklearn.kernel_ridge import KernelRidge
 
 import DatasetPreparation
-import ml
+import Estimator
 
 if __name__ == '__main__':
     #initialize the params
@@ -115,6 +115,11 @@ if __name__ == '__main__':
     rls_results = list()
     krls_results = list()
 
+    #list_of_testing_results
+    ls_test_results = list()
+    rls_test_results = list()
+    krls_test_results = list()
+
     #best result for all the algorithm
     best_ls = None
     best_rls = None
@@ -129,14 +134,15 @@ if __name__ == '__main__':
 
         print('%d - Preparing dataset...' % attempt)
         #obtain 4 different matrix (x-train, x-test, y-train, y-test)
-        xtr, xts, ytr, yts = ml.prepare_dataset(df, y_column, ts_size=testing_size)
+        xtr, xts, ytr, yts = Estimator.normalize_set(df, y_column, ts_size=testing_size)
 
         # LS algorithm
         print('%d - Training LS...' % attempt)
-        ls = ml.train_estimator(LinearRegression(), xtr, ytr, folds=folds)
+        ls = Estimator.train_estimator(LinearRegression(), xtr, ytr, params={}, folds=folds)
         print('%d - Testing LS...' % attempt)
-        ls_score = ml.test_estimator(ls, xts, yts)
+        ls_score, ls_score_2 = Estimator.test_estimator(ls, xts, yts)
         if saveResults:
+            ls_test_results.append(ls_score_2)
             for t in ls_score.index:
                 #get the actual row and all the columns in the dataframe
                 ls_results.append(ls_score.iloc[t][ls_score.columns])
@@ -148,10 +154,11 @@ if __name__ == '__main__':
         rls_params = {'alpha': logspace(rls_min_lambda, rls_max_lambda, rls_n_lambda_to_try)}
         print('%d - Training RLS...' % attempt)
         # solver='auto' different methods for the computational routines based on the data types
-        rls = ml.train_estimator(Ridge(solver='auto'), xtr, ytr, rls_params, folds=folds)
+        rls = Estimator.train_estimator(Ridge(solver='auto'), xtr, ytr, rls_params, folds=folds)
         print('%d - Testing RLS...' % attempt)
-        rls_score = ml.test_estimator(rls, xts, yts)
+        rls_score, rls_score_2 = Estimator.test_estimator(rls, xts, yts)
         if saveResults:
+            rls_test_results.append(rls_score_2)
             for t in rls_score.index:
                 #get the actual row and all the columns in the dataframe
                 rls_results.append(rls_score.iloc[t][rls_score.columns])
@@ -170,10 +177,11 @@ if __name__ == '__main__':
         }
 
         print('%d - Training KRLS...' % attempt)
-        krls = ml.train_estimator(KernelRidge(), xtr, ytr, krls_params, folds=folds)
+        krls = Estimator.train_estimator(KernelRidge(), xtr, ytr, krls_params, folds=folds)
         print('%d - Testing KRLS...' % attempt)
-        krls_score = ml.test_estimator(krls, xts, yts)
+        krls_score, krls_score_2 = Estimator.test_estimator(krls, xts, yts)
         if saveResults:
+            krls_test_results.append(krls_score_2)
             for t in krls_score.index:
                 #get the actual row and all the columns in the dataframe
                 krls_results.append(krls_score.iloc[t][krls_score.columns])
@@ -187,24 +195,41 @@ if __name__ == '__main__':
 
     if saveResults:
         if len(ls_results) != 0:
-            file_1 = open("PlotData/" + "LS-" + str(testing_size) + "-" + str(folds) + ".txt", "a")
+            file_1 = open("CrossData/" + "LS-" + str(testing_size) + "-" + str(folds) + ".txt", "a")
             for tt in ls_results:
                 file_1.write(str(tt['mean_test_score']) + "," + str(tt['mean_train_score']) + ";")
             file_1.close()
 
         if len(rls_results) != 0:
-            file_2 = open("PlotData/" + "RLS-" + str(testing_size) + "-" + str(folds) + ".txt", "a")
+            file_2 = open("CrossData/" + "RLS-" + str(testing_size) + "-" + str(folds) + ".txt", "a")
             for tt in rls_results:
                 file_2.write(
                     str(tt['param_alpha']) + "," + str(tt['mean_test_score']) + "," + str(tt['mean_train_score']) + ";")
             file_2.close()
         if len(krls_results) != 0:
-            file_3 = open("PlotData/" + "KRLS-" + str(testing_size) + "-" + str(folds) + ".txt", "a")
+            file_3 = open("CrossData/" + "KRLS-" + str(testing_size) + "-" + str(folds) + ".txt", "a")
             for tt in krls_results:
                 file_3.write(
                     tt['param_kernel'] + "," + str(tt['param_gamma']) + "," + str(tt['param_alpha']) + "," + str(
                         tt['mean_test_score']) + "," + str(tt['mean_train_score']) + ";")
             file_3.close()
+
+        if len(ls_test_results) != 0:
+            file_4 = open("TestData/" + "LS-" + str(testing_size) + "-" + str(folds) + ".txt", "a")
+            for tt in ls_test_results:
+                file_4.write(str(tt[0]) + ";")
+            file_4.close()
+        if len(rls_test_results) != 0:
+            file_5 = open("TestData/" + "RLS-" + str(testing_size) + "-" + str(folds) + ".txt", "a")
+            for tt in rls_test_results:
+                file_5.write(str(tt[0]) + "," + str(tt[1]['alpha']) + ";")
+            file_5.close()
+        if len(krls_test_results) != 0:
+            file_6 = open("TestData/" + "KRLS-" + str(testing_size) + "-" + str(folds) + ".txt", "a")
+            for tt in krls_test_results:
+                file_6.write(str(tt[0]) + "," + str(tt[1]['alpha']) + "," + str(tt[1]['gamma']) + "," + str(
+                    tt[1]['kernel']) + ";")
+            file_6.close()
 
     if printResults:
         if best_ls is not None:

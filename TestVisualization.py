@@ -8,7 +8,7 @@ def swap(list, id1, id2):
 if __name__ == '__main__':
 
     # Variable of the execution
-    PlotFolder = "CrossData"
+    PlotFolder = "TestData"
     ls_input = "LS-0.33-2.txt"
     rls_input = "RLS-0.33-2.txt"
     krls_input = "KRLS-0.33-2.txt"
@@ -37,7 +37,7 @@ if __name__ == '__main__':
 
     x = list()
     index = 0
-    train_score = list()
+    score = list()
     test_score = list()
     for row in input_data:
         #the last char in the file is ;
