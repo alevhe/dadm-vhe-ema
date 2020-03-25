@@ -1,7 +1,6 @@
-import getopt
-import sys
+from sklearn import preprocessing
 from numpy import logspace
-
+import pandas as pd
 from sklearn.linear_model import LinearRegression, Ridge
 from sklearn.kernel_ridge import KernelRidge
 
@@ -35,6 +34,16 @@ if __name__ == '__main__':
     # obtain 4 different matrix (x-train, x-test, y-train, y-test)
     xtr = input.loc[:, input.columns != y_column]
     ytr = input[y_column]
+
+    val = xtr.values
+    min_max_scaler = preprocessing.MinMaxScaler()
+    x_scaled = min_max_scaler.fit_transform(val)
+    xtr = pd.DataFrame(x_scaled)
+
+    val_test = test.values
+    min_max_scaler_test = preprocessing.MinMaxScaler()
+    test_scaled = min_max_scaler_test.fit_transform(val_test)
+    test = pd.DataFrame(test_scaled)
 
     if withLS:
         ls = Estimator.train_estimator(LinearRegression(), xtr, ytr, params={}, folds=folds)
