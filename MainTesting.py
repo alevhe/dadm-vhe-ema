@@ -21,21 +21,29 @@ if __name__ == '__main__':
     rls_min_lambda = -3  # exponent of 10, is the minimum value of lambda to try
     rls_max_lambda = 1  # exponent of 10, is the maximum value of lambda to try
     kernel_list = ['laplacian']  # list of the kernel to be used
-    krls_n_lambda_to_try = 40  # number of lambda to try
-    krls_min_lambda = -1.5  # exponent of 10, is the minimum value of lambda to try
-    krls_max_lambda = -1.4  # exponent of 10, is the maximum value of lambda to try
-    krls_n_gamma_to_try = 40  # number of gamma to try
-    krls_min_gamma = -0.7 # exponent of 10, is the minimum value of gamma to try
-    krls_max_gamma = -0.5  # exponent of 10, is the maximum value of gamma to try
+    krls_n_lambda_to_try = 10  # number of lambda to try
+    krls_min_lambda = -3  # exponent of 10, is the minimum value of lambda to try
+    krls_max_lambda = 2  # exponent of 10, is the maximum value of lambda to try
+    krls_n_gamma_to_try = 10  # number of gamma to try
+    krls_min_gamma = -3 # exponent of 10, is the minimum value of gamma to try
+    krls_max_gamma = -2  # exponent of 10, is the maximum value of gamma to try
 
     #read the dataset only the first time (I doesn't change)
     print('Reading dataset...')
     test = DataPreProccesing._read_file(test_filename)
-
     df = DataPreProccesing._read_file(input_filename)
 
     x_first = df.loc[:, df.columns != y_column]
     ytr = df[y_column]
+
+    test_c = test.columns
+    x_c = x_first.columns
+
+    test_to_add = [x for x in x_c if x not in test_c]
+    x_to_add = [x for x in test_c if x not in x_c]
+
+    x_first = DataPreProccesing._add_columns(x_first, x_to_add)
+    test = DataPreProccesing._add_columns(test, test_to_add)
 
     if not l2:
         val = x_first.values

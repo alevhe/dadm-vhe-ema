@@ -194,19 +194,19 @@ if __name__ == '__main__':
                          'param_kernel': 'Kernel', 'param_gamma': 'Gamma'}).iloc[krls_score['mean_test_score'].idxmax()]
         if saveResults:
             if len(ls_results) != 0:
-                file_1 = open("CrossData/" + "LS-" + str(testing_size) + "-" + str(folds) + ".txt", "a")
+                file_1 = open("GoodCrossData/" + "LS-" + str(testing_size) + "-" + str(folds) + ".txt", "a")
                 for tt in ls_results:
                     file_1.write(str(tt['mean_test_score']) + "," + str(tt['mean_train_score']) + ";")
                 file_1.close()
             if len(rls_results) != 0:
-                file_2 = open("CrossData/" + "RLS-" + str(testing_size) + "-" + str(folds) + ".txt", "a")
+                file_2 = open("GoodCrossData/" + "RLS-" + str(testing_size) + "-" + str(folds) + ".txt", "a")
                 for tt in rls_results:
                     file_2.write(
                         str(tt['param_alpha']) + "," + str(tt['mean_test_score']) + "," + str(
                             tt['mean_train_score']) + ";")
                 file_2.close()
             if len(krls_results) != 0:
-                file_3 = open("CrossData/" + "KRLS-" + str(testing_size) + "-" + str(folds) + ".txt", "a")
+                file_3 = open("GoodCrossData/" + "KRLS-" + str(testing_size) + "-" + str(folds) + ".txt", "a")
                 for tt in krls_results:
                     file_3.write(
                         tt['param_kernel'] + "," + str(tt['param_gamma']) + "," + str(tt['param_alpha']) + "," + str(
@@ -214,17 +214,17 @@ if __name__ == '__main__':
                 file_3.close()
 
             if len(ls_test_results) != 0:
-                file_4 = open("TestData/" + "LS-" + str(testing_size) + "-" + str(folds) + ".txt", "a")
+                file_4 = open("GoodTestData/" + "LS-" + str(testing_size) + "-" + str(folds) + ".txt", "a")
                 for tt in ls_test_results:
                     file_4.write(str(tt[0]) + ";")
                 file_4.close()
             if len(rls_test_results) != 0:
-                file_5 = open("TestData/" + "RLS-" + str(testing_size) + "-" + str(folds) + ".txt", "a")
+                file_5 = open("GoodTestData/" + "RLS-" + str(testing_size) + "-" + str(folds) + ".txt", "a")
                 for tt in rls_test_results:
                     file_5.write(str(tt[0]) + "," + str(tt[1]['alpha']) + ";")
                 file_5.close()
             if len(krls_test_results) != 0:
-                file_6 = open("TestData/" + "KRLS-" + str(testing_size) + "-" + str(folds) + ".txt", "a")
+                file_6 = open("GoodTestData/" + "KRLS-" + str(testing_size) + "-" + str(folds) + ".txt", "a")
                 for tt in krls_test_results:
                     file_6.write(str(tt[0]) + "," + str(tt[1]['alpha']) + "," + str(tt[1]['gamma']) + "," + str(
                         tt[1]['kernel']) + ";")
