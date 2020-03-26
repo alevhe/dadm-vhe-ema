@@ -39,6 +39,8 @@ if __name__ == '__main__':
     test = normalize(test, axis=0)
     xtr = normalize(x_first, axis=0)
     """
+    "Standard" Normalization
+    
     val = x_first.values
     min_max_scaler = preprocessing.MinMaxScaler()
     x_scaled = min_max_scaler.fit_transform(val)
@@ -70,7 +72,7 @@ if __name__ == '__main__':
         krls_result = krls.predict(test)
         print("Predicted")
         #DataFrame construction for Kaggle
-        file_output = open("Output/output.csv", "w")
+        file_output = open("Output/output-13210.csv", "w")
         file_output.write("Id,SalePrice\n")
         for res in range(len(krls_result)):
             file_output.write(str(1461+res)+","+str(krls_result[res])+"\n")
