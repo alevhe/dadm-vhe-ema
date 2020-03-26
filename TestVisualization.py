@@ -16,7 +16,7 @@ if __name__ == '__main__':
     krls_input = "KRLS-"+str(testing_size)+"-"+str(folds)+".txt"
 
     #lower bound for the score when analyzing krls (because of the color scale)
-    limit_value_for_krls = 0.5
+    limit_value_for_krls = 0.85
 
     #limits for lambda (they allow to zoom areas)
     rls_min_lambda = 0.0001
@@ -47,10 +47,10 @@ if __name__ == '__main__':
         x.append(index)
         index += 1
         score.append(float(row))
-    plt.plot(x, score, color='r', linestyle='-', marker=".", markersize=5, label="test score")
+    plt.plot(x, score, color='r', linestyle='-', label="test score")
     plt.xlabel("Iterazioni")
     plt.ylabel("Mean score")
-    plt.title("LS results")
+    plt.title("LS results - " + str(testing_size) + " " + str(folds))
     plt.legend(frameon=False, loc='lower center')
     plt.show()
 
@@ -96,7 +96,7 @@ if __name__ == '__main__':
     plt.plot(x, test, color='r', linestyle='-', marker=".", markersize=5, label="test score")
     plt.xlabel("lambda")
     plt.ylabel("Mean score")
-    plt.title("RLS results")
+    plt.title("RLS results - " + str(len(test))+" - " + str(testing_size) + " " + str(folds))
     plt.legend(frameon=False, loc='lower center')
     plt.xscale("log")
     plt.show()
@@ -187,7 +187,7 @@ if __name__ == '__main__':
 
 
 #        plt.subplot(1, 1, 1)
-        plt.title(kernel+" - Test")
+        plt.title(kernel+" - Train - "+str(len(test))+" - "+str(testing_size)+" "+str(folds))
         plt.ylabel('gamma')
         plt.xlabel('lambda')
         points = plt.scatter(x, y, c=test, s=10, cmap=cmap)

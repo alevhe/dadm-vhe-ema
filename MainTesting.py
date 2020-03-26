@@ -15,17 +15,18 @@ if __name__ == '__main__':
     withLS = False
     withRLS = False
     withKRLS = True
-    folds = 3
+    l2 = True  # if to normalize with l2
+    folds = 4
     rls_n_lambda_to_try = 8  # number of lambda to try
     rls_min_lambda = -3  # exponent of 10, is the minimum value of lambda to try
     rls_max_lambda = 1  # exponent of 10, is the maximum value of lambda to try
-    kernel_list = ['rbf', 'poly', 'laplacian']  # list of the kernel to be used
-    krls_n_lambda_to_try = 15  # number of lambda to try
-    krls_min_lambda = -1.52  # exponent of 10, is the minimum value of lambda to try
-    krls_max_lambda = -1.48  # exponent of 10, is the maximum value of lambda to try
-    krls_n_gamma_to_try = 15  # number of gamma to try
-    krls_min_gamma = -0.62 # exponent of 10, is the minimum value of gamma to try
-    krls_max_gamma = -0.58  # exponent of 10, is the maximum value of gamma to try
+    kernel_list = ['laplacian']  # list of the kernel to be used
+    krls_n_lambda_to_try = 40  # number of lambda to try
+    krls_min_lambda = -1.5  # exponent of 10, is the minimum value of lambda to try
+    krls_max_lambda = -1.4  # exponent of 10, is the maximum value of lambda to try
+    krls_n_gamma_to_try = 40  # number of gamma to try
+    krls_min_gamma = -0.7 # exponent of 10, is the minimum value of gamma to try
+    krls_max_gamma = -0.5  # exponent of 10, is the maximum value of gamma to try
 
     #read the dataset only the first time (I doesn't change)
     print('Reading dataset...')
@@ -36,19 +37,19 @@ if __name__ == '__main__':
     x_first = df.loc[:, df.columns != y_column]
     ytr = df[y_column]
 
-    test = normalize(test, axis=0)
-    xtr = normalize(x_first, axis=0)
-    """
-    val = x_first.values
-    min_max_scaler = preprocessing.MinMaxScaler()
-    x_scaled = min_max_scaler.fit_transform(val)
-    xtr = pd.DataFrame(x_scaled)
-    
-    val_test = test.values
-    min_max_scaler_test = preprocessing.MinMaxScaler()
-    test_scaled = min_max_scaler_test.fit_transform(val_test)
-    test = pd.DataFrame(test_scaled)
-    """
+    if not l2:
+        val = x_first.values
+        min_max_scaler = preprocessing.MinMaxScaler()
+        x_scaled = min_max_scaler.fit_transform(val)
+        xtr = pd.DataFrame(x_scaled)
+
+        val_test = test.values
+        min_max_scaler_test = preprocessing.MinMaxScaler()
+        test_scaled = min_max_scaler_test.fit_transform(val_test)
+        test = pd.DataFrame(test_scaled)
+    else:
+        test = normalize(test, axis=0)
+        xtr = normalize(x_first, axis=0)
 
     if withLS:
         ls = Estimator.train_estimator(LinearRegression(), xtr, ytr, params={}, folds=folds)
@@ -64,7 +65,7 @@ if __name__ == '__main__':
             'alpha': logspace(krls_min_lambda, krls_max_lambda, krls_n_lambda_to_try),
             'gamma': logspace(krls_min_gamma, krls_max_gamma, krls_n_gamma_to_try)
         }
-        krls = Estimator.train_estimator(KernelRidge(), xtr, ytr, krls_params, folds=folds)
+        krls = Estimator.train_estimator(KernelRidge(), xtr, ytr, krls_params, train_score=False, folds=folds)
         print(krls.best_params_, krls.best_score_)
         print("Predicting KRLS...")
         krls_result = krls.predict(test)

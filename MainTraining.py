@@ -15,28 +15,28 @@ if __name__ == '__main__':
     testing_size = 0.2 #percentage of testing set over total
     folds = 4 #folds-1 train and the other test for folds time to try different params
     max_dimension = 10000 #the dataset is a subset of the dataset stored in file
-    montecarlo = 20 #number of repetitions for better accuracy
-    rls_n_lambda_to_try = 98 #number of lambda to try
-    rls_min_lambda = -3 #exponent of 10, is the minimum value of lambda to try
-    rls_max_lambda = 3  #exponent of 10, is the maximum value of lambda to try
-    kernel_list = ['rbf','poly','laplacian'] #list of the kernel to be used
-    krls_n_lambda_to_try = 5 #number of lambda to try
+    montecarlo = 40 #number of repetitions for better accuracy
+    rls_n_lambda_to_try = 10 #number of lambda to try
+    rls_min_lambda = -0.5 #exponent of 10, is the minimum value of lambda to try
+    rls_max_lambda = 2  #exponent of 10, is the maximum value of lambda to try
+    kernel_list = ['rbf','poly','laplacian', 'chi2', 'linear', 'sigmoid'] #list of the kernel to be used
+    krls_n_lambda_to_try = 27 #number of lambda to try
     krls_min_lambda = -4 #exponent of 10, is the minimum value of lambda to try
     krls_max_lambda = 1  #exponent of 10, is the maximum value of lambda to try
-    krls_n_gamma_to_try = 5 #number of gamma to try
+    krls_n_gamma_to_try = 27 #number of gamma to try
     krls_min_gamma = -4 #exponent of 10, is the minimum value of gamma to try
     krls_max_gamma = 1  #exponent of 10, is the maximum value of gamma to try
     printResults = True #if to print results at the end
     saveResults = True #if to store data to the predefined file
 
     #check if there are params passed through command line
-    help_string = "MainTraining.py\n " \
-                  " -F <name of the file to be trained>\n " \
-                  " -y <label of the results column>\n " \
+    help_string = "MainTraining.py\n" \
+                  " -F <name of the file to be trained>\n" \
+                  " -y <label of the results column>\n" \
                   " -s <percentage of testing set over total>\n " \
-                  " -f <folds-1 train and the other test for folds time to try different params>\n " \
-                  " -M <the dataset is a subset of the dataset stored in file>\n " \
-                  " -r <number of repetitions for better accuracy>\n " \
+                  " -f <folds-1 train and the other test for folds time to try different params>\n" \
+                  " -M <the dataset is a subset of the dataset stored in file>\n" \
+                  " -r <number of repetitions for better accuracy>\n" \
                   " -p <1 if print results at the end, 0 otherwise>\n" \
                   " -S <1 if store data to the predefined file, 0 otherwise>\n" \
                   " -a <number of lambda to try in RLS>\n" \
@@ -110,7 +110,7 @@ if __name__ == '__main__':
         elif opt in ("-k", "--kernel"):
             kernel_list = arg.split(",")
 
-    #best result for all the algorithm
+    #best result for all the algorithm to print
     best_ls = None
     best_rls = None
     best_krls = None
@@ -198,7 +198,6 @@ if __name__ == '__main__':
                 for tt in ls_results:
                     file_1.write(str(tt['mean_test_score']) + "," + str(tt['mean_train_score']) + ";")
                 file_1.close()
-
             if len(rls_results) != 0:
                 file_2 = open("CrossData/" + "RLS-" + str(testing_size) + "-" + str(folds) + ".txt", "a")
                 for tt in rls_results:
