@@ -8,13 +8,15 @@ def swap(list, id1, id2):
 if __name__ == '__main__':
 
     # Variable of the execution
+    testing_size = 0.2
+    folds = 4
     PlotFolder = "CrossData"
-    ls_input = "LS-0.33-2.txt"
-    rls_input = "RLS-0.33-2.txt"
-    krls_input = "KRLS-0.33-2.txt"
+    ls_input = "LS-"+str(testing_size)+"-"+str(folds)+".txt"
+    rls_input = "RLS-"+str(testing_size)+"-"+str(folds)+".txt"
+    krls_input = "KRLS-"+str(testing_size)+"-"+str(folds)+".txt"
 
     #lower bound for the score when analyzing krls (because of the color scale)
-    limit_value_for_krls = 0.7
+    limit_value_for_krls = 0.5
 
     #limits for lambda (they allow to zoom areas)
     rls_min_lambda = 0.0001
@@ -52,7 +54,7 @@ if __name__ == '__main__':
     plt.plot(x, test_score, color='r', linestyle='-', marker=".", markersize=5, label="test score")
     plt.xlabel("Iterazioni")
     plt.ylabel("Mean score")
-    plt.title("LS results")
+    plt.title("LS results - "+str(testing_size)+" "+str(folds))
     plt.legend(frameon=False, loc='lower center')
     plt.show()
 
@@ -102,11 +104,11 @@ if __name__ == '__main__':
         train.append(sum_train/(index-start_index+1))
         test.append(sum_test/(index-start_index+1))
         x.append(alpha[index])
-    plt.plot(x, train, color='b', linestyle='-', marker=".", markersize=5, label="train score")
-    plt.plot(x, test, color='r', linestyle='-', marker=".", markersize=5, label="test score")
+    plt.plot(x, train, color='b', linestyle='-', label="train score")
+    plt.plot(x, test, color='r', linestyle='-', label="test score")
     plt.xlabel("lambda")
     plt.ylabel("Mean score")
-    plt.title("RLS results")
+    plt.title("RLS results - " +str(len(train_score))+" - "+ str(testing_size) + " " + str(folds))
     plt.legend(frameon=False, loc='lower center')
     plt.xscale("log")
     plt.show()
@@ -212,9 +214,9 @@ if __name__ == '__main__':
             y.append(gamma[index])
 
 
-        plt.subplot(1, 2, 1)
+        plt.subplot(1, 2, 2)
         #f, ax = plt.subplots()
-        plt.title(kernel+" - Test")
+        plt.title(kernel+" - Test - "+str(len(train_score))+" - "+str(testing_size)+" "+str(folds))
         plt.ylabel('gamma')
         plt.xlabel('lambda')
         points = plt.scatter(x, y, c=test, s=10, cmap=cmap)
@@ -222,9 +224,9 @@ if __name__ == '__main__':
         plt.yscale("log")
         plt.xscale("log")
 
-        plt.subplot(1, 2, 2)
+        plt.subplot(1, 2, 1)
         #f, ax = plt.subplots()
-        plt.title(kernel+" - Train")
+        plt.title(kernel+" - Train - "+str(len(train_score))+" - "+str(testing_size)+" "+str(folds))
         plt.ylabel('gamma')
         plt.xlabel('lambda')
         points = plt.scatter(x, y, c=train, s=10, cmap=cmap)

@@ -12,19 +12,19 @@ if __name__ == '__main__':
     #initialize the params
     filename = 'data/train.csv'#name of the fail to be trained
     y_column = 'SalePrice' #label of the results column
-    testing_size = 0.33 #percentage of testing set over total
-    folds = 2 #folds-1 train and the other test for folds time to try different params
-    max_dimension = 1000 #the dataset is a subset of the dataset stored in file
-    montecarlo = 6 #number of repetitions for better accuracy
-    rls_n_lambda_to_try = 8 #number of lambda to try
+    testing_size = 0.2 #percentage of testing set over total
+    folds = 4 #folds-1 train and the other test for folds time to try different params
+    max_dimension = 10000 #the dataset is a subset of the dataset stored in file
+    montecarlo = 20 #number of repetitions for better accuracy
+    rls_n_lambda_to_try = 98 #number of lambda to try
     rls_min_lambda = -3 #exponent of 10, is the minimum value of lambda to try
-    rls_max_lambda = 1  #exponent of 10, is the maximum value of lambda to try
+    rls_max_lambda = 3  #exponent of 10, is the maximum value of lambda to try
     kernel_list = ['rbf','poly','laplacian'] #list of the kernel to be used
-    krls_n_lambda_to_try = 8 #number of lambda to try
-    krls_min_lambda = -3 #exponent of 10, is the minimum value of lambda to try
+    krls_n_lambda_to_try = 5 #number of lambda to try
+    krls_min_lambda = -4 #exponent of 10, is the minimum value of lambda to try
     krls_max_lambda = 1  #exponent of 10, is the maximum value of lambda to try
-    krls_n_gamma_to_try = 8 #number of gamma to try
-    krls_min_gamma = -3 #exponent of 10, is the minimum value of gamma to try
+    krls_n_gamma_to_try = 5 #number of gamma to try
+    krls_min_gamma = -4 #exponent of 10, is the minimum value of gamma to try
     krls_max_gamma = 1  #exponent of 10, is the maximum value of gamma to try
     printResults = True #if to print results at the end
     saveResults = True #if to store data to the predefined file
@@ -110,16 +110,6 @@ if __name__ == '__main__':
         elif opt in ("-k", "--kernel"):
             kernel_list = arg.split(",")
 
-    #store the results of the different algorithms
-    ls_results = list()
-    rls_results = list()
-    krls_results = list()
-
-    #list_of_testing_results
-    ls_test_results = list()
-    rls_test_results = list()
-    krls_test_results = list()
-
     #best result for all the algorithm
     best_ls = None
     best_rls = None
@@ -131,6 +121,16 @@ if __name__ == '__main__':
 
     #for all the attempts
     for attempt in range(montecarlo):
+
+        # store the results of the different algorithms
+        ls_results = list()
+        rls_results = list()
+        krls_results = list()
+
+        # list_of_testing_results
+        ls_test_results = list()
+        rls_test_results = list()
+        krls_test_results = list()
 
         print('%d - Preparing dataset...' % attempt)
         #obtain 4 different matrix (x-train, x-test, y-train, y-test)
@@ -192,45 +192,44 @@ if __name__ == '__main__':
                 columns={'param_alpha': 'Alpha', 'mean_test_score': 'Mean Test Score',
                          'mean_train_score': 'Mean Train Score',
                          'param_kernel': 'Kernel', 'param_gamma': 'Gamma'}).iloc[krls_score['mean_test_score'].idxmax()]
+        if saveResults:
+            if len(ls_results) != 0:
+                file_1 = open("CrossData/" + "LS-" + str(testing_size) + "-" + str(folds) + ".txt", "a")
+                for tt in ls_results:
+                    file_1.write(str(tt['mean_test_score']) + "," + str(tt['mean_train_score']) + ";")
+                file_1.close()
 
-    if saveResults:
-        if len(ls_results) != 0:
-            file_1 = open("CrossData/" + "LS-" + str(testing_size) + "-" + str(folds) + ".txt", "a")
-            for tt in ls_results:
-                file_1.write(str(tt['mean_test_score']) + "," + str(tt['mean_train_score']) + ";")
-            file_1.close()
+            if len(rls_results) != 0:
+                file_2 = open("CrossData/" + "RLS-" + str(testing_size) + "-" + str(folds) + ".txt", "a")
+                for tt in rls_results:
+                    file_2.write(
+                        str(tt['param_alpha']) + "," + str(tt['mean_test_score']) + "," + str(
+                            tt['mean_train_score']) + ";")
+                file_2.close()
+            if len(krls_results) != 0:
+                file_3 = open("CrossData/" + "KRLS-" + str(testing_size) + "-" + str(folds) + ".txt", "a")
+                for tt in krls_results:
+                    file_3.write(
+                        tt['param_kernel'] + "," + str(tt['param_gamma']) + "," + str(tt['param_alpha']) + "," + str(
+                            tt['mean_test_score']) + "," + str(tt['mean_train_score']) + ";")
+                file_3.close()
 
-        if len(rls_results) != 0:
-            file_2 = open("CrossData/" + "RLS-" + str(testing_size) + "-" + str(folds) + ".txt", "a")
-            for tt in rls_results:
-                file_2.write(
-                    str(tt['param_alpha']) + "," + str(tt['mean_test_score']) + "," + str(tt['mean_train_score']) + ";")
-            file_2.close()
-        if len(krls_results) != 0:
-            file_3 = open("CrossData/" + "KRLS-" + str(testing_size) + "-" + str(folds) + ".txt", "a")
-            for tt in krls_results:
-                file_3.write(
-                    tt['param_kernel'] + "," + str(tt['param_gamma']) + "," + str(tt['param_alpha']) + "," + str(
-                        tt['mean_test_score']) + "," + str(tt['mean_train_score']) + ";")
-            file_3.close()
-
-        if len(ls_test_results) != 0:
-            file_4 = open("TestData/" + "LS-" + str(testing_size) + "-" + str(folds) + ".txt", "a")
-            for tt in ls_test_results:
-                file_4.write(str(tt[0]) + ";")
-            file_4.close()
-        if len(rls_test_results) != 0:
-            file_5 = open("TestData/" + "RLS-" + str(testing_size) + "-" + str(folds) + ".txt", "a")
-            for tt in rls_test_results:
-                file_5.write(str(tt[0]) + "," + str(tt[1]['alpha']) + ";")
-            file_5.close()
-        if len(krls_test_results) != 0:
-            file_6 = open("TestData/" + "KRLS-" + str(testing_size) + "-" + str(folds) + ".txt", "a")
-            for tt in krls_test_results:
-                file_6.write(str(tt[0]) + "," + str(tt[1]['alpha']) + "," + str(tt[1]['gamma']) + "," + str(
-                    tt[1]['kernel']) + ";")
-            file_6.close()
-
+            if len(ls_test_results) != 0:
+                file_4 = open("TestData/" + "LS-" + str(testing_size) + "-" + str(folds) + ".txt", "a")
+                for tt in ls_test_results:
+                    file_4.write(str(tt[0]) + ";")
+                file_4.close()
+            if len(rls_test_results) != 0:
+                file_5 = open("TestData/" + "RLS-" + str(testing_size) + "-" + str(folds) + ".txt", "a")
+                for tt in rls_test_results:
+                    file_5.write(str(tt[0]) + "," + str(tt[1]['alpha']) + ";")
+                file_5.close()
+            if len(krls_test_results) != 0:
+                file_6 = open("TestData/" + "KRLS-" + str(testing_size) + "-" + str(folds) + ".txt", "a")
+                for tt in krls_test_results:
+                    file_6.write(str(tt[0]) + "," + str(tt[1]['alpha']) + "," + str(tt[1]['gamma']) + "," + str(
+                        tt[1]['kernel']) + ";")
+                file_6.close()
     if printResults:
         if best_ls is not None:
             print("")

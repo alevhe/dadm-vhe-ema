@@ -8,13 +8,15 @@ def swap(list, id1, id2):
 if __name__ == '__main__':
 
     # Variable of the execution
+    testing_size = 0.2
+    folds = 4
     PlotFolder = "TestData"
-    ls_input = "LS-0.33-2.txt"
-    rls_input = "RLS-0.33-2.txt"
-    krls_input = "KRLS-0.33-2.txt"
+    ls_input = "LS-"+str(testing_size)+"-"+str(folds)+".txt"
+    rls_input = "RLS-"+str(testing_size)+"-"+str(folds)+".txt"
+    krls_input = "KRLS-"+str(testing_size)+"-"+str(folds)+".txt"
 
     #lower bound for the score when analyzing krls (because of the color scale)
-    limit_value_for_krls = 0.7
+    limit_value_for_krls = 0.5
 
     #limits for lambda (they allow to zoom areas)
     rls_min_lambda = 0.0001
