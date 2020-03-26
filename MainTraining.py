@@ -5,7 +5,7 @@ from numpy import logspace
 from sklearn.linear_model import LinearRegression, Ridge
 from sklearn.kernel_ridge import KernelRidge
 
-import DatasetPreparation
+import DataPreProccesing
 import Estimator
 
 if __name__ == '__main__':
@@ -117,7 +117,7 @@ if __name__ == '__main__':
 
     #read the dataset only the first time (I doesn't change)
     print('Reading dataset...')
-    df = DatasetPreparation._read_file(filename).iloc[:max_dimension]
+    df = DataPreProccesing._read_file(filename).iloc[:max_dimension]
 
     #for all the attempts
     for attempt in range(montecarlo):
