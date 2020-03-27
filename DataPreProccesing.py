@@ -106,6 +106,21 @@ def _read_file(filename):
     df = pd.read_csv(filename)
     df = df.drop('Id', axis=1)
 
+    # if second field none => 0 otherwise mean
+    df = _condition_and_encode(df, 'MasVnrArea', ['MasVnrType'], [None])
+    df = _condition_and_encode(df, 'BsmtFinSF1', ['BsmtFinType1'], [None])
+    df = _condition_and_encode(df, 'BsmtFinSF2', ['BsmtFinType2'], [None])
+    df = _condition_and_encode(df, 'TotalBsmtSF', ['BsmtFinType1','BsmtFinType2'], [None, None])
+    df = _condition_and_encode(df, 'BsmtFullBath', ['BsmtFinType1', 'BsmtFinType2'], [None, None])
+    df = _condition_and_encode(df, 'BsmtHalfBath', ['BsmtFinType1', 'BsmtFinType2'], [None, None])
+    df = _condition_and_encode(df, 'GarageCars', ['GarageType', 'GarageCond', 'GarageQual'], [None, None, None])
+    df = _condition_and_encode(df, 'GarageArea', ['GarageType', 'GarageCond', 'GarageQual'], [None, None, None])
+
+    df = _condition_or_encode(df, 'BsmtUnfSF', ['BsmtFinType1', 'BsmtFinType2'], ['Unf', 'Unf'])
+
+    df = _min_and_encode(df, 'GarageYrBlt', ['GarageType', 'GarageCond', 'GarageQual'], [None, None, None])
+
+
     # the following fields were the following of which we took the mean
     df = _avarage_and_encode(df, 'SaleType')
     df = _avarage_and_encode(df, 'ExterCond')
@@ -154,20 +169,6 @@ def _read_file(filename):
     df = _data_encode(df, 'HouseStyle')
     df = _data_encode(df, 'RoofStyle')
     df = _data_encode(df, 'RoofMatl')
-
-    # if second field none => 0 otherwise mean
-    df = _condition_and_encode(df, 'MasVnrArea', ['MasVnrType'], [None])
-    df = _condition_and_encode(df, 'BsmtFinSF1', ['BsmtFinType1'], [None])
-    df = _condition_and_encode(df, 'BsmtFinSF2', ['BsmtFinType2'], [None])
-    df = _condition_and_encode(df, 'TotalBsmtSF', ['BsmtFinType1','BsmtFinType2'], [None, None])
-    df = _condition_and_encode(df, 'BsmtFullBath', ['BsmtFinType1', 'BsmtFinType2'], [None, None])
-    df = _condition_and_encode(df, 'BsmtHalfBath', ['BsmtFinType1', 'BsmtFinType2'], [None, None])
-    df = _condition_and_encode(df, 'GarageCars', ['GarageType', 'GarageCond', 'GarageQual'], [None, None, None])
-    df = _condition_and_encode(df, 'GarageArea', ['GarageType', 'GarageCond', 'GarageQual'], [None, None, None])
-
-    df = _condition_or_encode(df, 'BsmtUnfSF', ['BsmtFinType1', 'BsmtFinType2'], ['Unf', 'Unf'])
-
-    df = _min_and_encode(df, 'GarageYrBlt', ['GarageType', 'GarageCond', 'GarageQual'], [None, None, None])
 
     df = _pool_encode(df, 'PoolQc', 'PoolArea')
 
