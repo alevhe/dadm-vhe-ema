@@ -24,11 +24,66 @@ def _value_and_encode(df, column_name):
     df[column_name] = df[column_name].replace(to_replace=replacement)
     return _data_encode(df, column_name)
 
-#TODO
-def _ifnan_and_avarage(df, column_name, column_to_check):
-    sum_list = [x for x in df['MasVnrArea'] if str(x) != 'nan']
-    MasVnrArea = {None: sum(sum_list) / len(sum_list)}
-    df['MasVnrArea'] = df['MasVnrArea'].replace(to_replace=MasVnrArea)
+def _condition_and_encode(df, column_name, columns_to_check, values_to_check):
+    list_index = list()
+    for column_id in range(len(columns_to_check)):
+        data_to_check = df[columns_to_check[column_id]]
+        list_index.append([x for x in data_to_check.index if data_to_check[x] == values_to_check[column_id]])
+    total_list = list()
+    if len(list_index) > 0:
+        for col in list_index[0]:
+            found = False
+            for row in list_index:
+                if col not in row:
+                    found = True
+            if not found:
+                total_list.append(col)
+    lines_to_modify = [x for x in df[column_name] if str(x) == 'nan' and x not in total_list]
+    if len(lines_to_modify) > 0:
+        sum_list = [x for x in df[column_name] if str(x) != 'nan']
+        df[column_name][lines_to_modify] = sum(sum_list) / len(sum_list)
+    if len(total_list) > 0:
+        df[total_list][column_name] = 0
+
+def _condition_or_encode(df, column_name, columns_to_check, values_to_check):
+    list_index = list()
+    for column_id in range(len(columns_to_check)):
+        data_to_check = df[columns_to_check[column_id]]
+        list_index.append([x for x in data_to_check.index if data_to_check[x] == values_to_check[column_id]])
+    total_list = list()
+    if len(list_index) > 0:
+        for col in list_index:
+            for r in col:
+                if r not in total_list:
+                    total_list.append(r)
+    #TODO check all the combination of presence
+    #TODO check the mean of the percentage of unfinished
+    lines_to_modify = [x for x in df[column_name] if str(x) == 'nan' and x not in total_list]
+    if len(lines_to_modify) > 0:
+        sum_list = [x for x in df[column_name] if str(x) != 'nan']
+        df[column_name][lines_to_modify] = sum(sum_list) / len(sum_list)
+    if len(total_list) > 0:
+        df[total_list][column_name] = 0
+
+def _min_and_encode(df, column_name, columns_to_check, values_to_check):
+    list_index = list()
+    for column_id in range(len(columns_to_check)):
+        data_to_check = df[columns_to_check[column_id]]
+        list_index.append([x for x in data_to_check.index if data_to_check[x] == values_to_check[column_id]])
+    total_list = list()
+    if len(list_index) > 0:
+        for col in list_index:
+            for r in col:
+                if r not in total_list:
+                    total_list.append(r)
+    #TODO check all the combination of presence
+    #TODO check the mean of the percentage of unfinished
+    lines_to_modify = [x for x in df[column_name] if str(x) == 'nan' and x not in total_list]
+    if len(lines_to_modify) > 0:
+        sum_list = [x for x in df[column_name] if str(x) != 'nan']
+        df[column_name][lines_to_modify] = sum(sum_list) / len(sum_list)
+    if len(total_list) > 0:
+        df[total_list][column_name] = df[column_name].min()
 
 def _read_file(filename):
     df = pd.read_csv(filename)
@@ -56,6 +111,11 @@ def _read_file(filename):
     df = _value_and_encode(df, 'BsmtQual')
     df = _value_and_encode(df, 'BsmtCond')
     df = _value_and_encode(df, 'BsmtExposure')
+    df = _value_and_encode(df, 'Fence')
+    df = _value_and_encode(df, 'GarageType')
+    df = _value_and_encode(df, 'GarageCond')
+    df = _value_and_encode(df, 'GarageQual')
+    df = _value_and_encode(df, 'GarageFinish')
 
     #the following fields doon't expect to see nan
     df = _data_encode(df, 'SaleCondition')
@@ -76,9 +136,19 @@ def _read_file(filename):
     df = _data_encode(df, 'RoofMatl')
 
     # if second field none => 0 otherwise mean
-    df = _ifnan_and_avarage(df, 'MasVnrArea', 'MasVnrType')
-    df = _ifnan_and_avarage(df, 'BsmtFinSF1', 'BsmtFinType1')
-    df = _ifnan_and_avarage(df, 'BsmtFinSF2', 'BsmtFinType2')
+    df = _condition_and_encode(df, 'MasVnrArea', ['MasVnrType'], [None])
+    df = _condition_and_encode(df, 'BsmtFinSF1', ['BsmtFinType1'], [None])
+    df = _condition_and_encode(df, 'BsmtFinSF2', ['BsmtFinType2'], [None])
+    df = _condition_and_encode(df, 'TotalBsmtSF', ['BsmtFinType1','BsmtFinType2'], [None, None])
+    df = _condition_and_encode(df, 'BsmtFullBath', ['BsmtFinType1', 'BsmtFinType2'], [None, None])
+    df = _condition_and_encode(df, 'BsmtHalfBath', ['BsmtFinType1', 'BsmtFinType2'], [None, None])
+    df = _condition_and_encode(df, 'PoolQc', ['PoolArea'], [0])
+
+    df = _condition_or_encode(df, 'BsmtUnfSF', ['BsmtFinType1', 'BsmtFinType2'], ['Unf', 'Unf'])
+    df = _condition_or_encode(df, 'GarageCars', ['GarageType', 'GarageCond', 'GarageQual'], [None, None, None])
+    df = _condition_or_encode(df, 'GarageArea', ['GarageType', 'GarageCond', 'GarageQual'], [None, None, None])
+
+    df = _min_and_encode(df, 'GarageYrBlt', ['GarageType', 'GarageCond', 'GarageQual'], [None, None, None])
 
     #se non c'è vuol dire che è 0 giusto?
     LotFrontage = {None: 0}
@@ -90,10 +160,10 @@ def _read_file(filename):
     Street = {'Grvl': 0, 'Pave': 1}
     df['Street'] = df['Street'].replace(to_replace=Street)
 
-    # se masvnrtpe=none => 0 otherwise mean(?)
-
-
     """    
+     Fence = {None: 0, 'MnWw': 1, 'GdWo': 2, 'MnPrv': 3, 'GdPrv': 4}
+        df['Fence'] = df['Fence'].replace(to_replace=Fence)
+    
         BsmtFinType2 = {None: 0, 'Unf': 1, 'LwQ': 2, "Rec": 3, 'BLQ': 4, 'ALQ': 5, 'GLQ': 6}
         df['BsmtFinType2'] = df['BsmtFinType2'].replace(to_replace=BsmtFinType2)
         
@@ -249,13 +319,8 @@ def _read_file(filename):
     sum_list = [x for x in df['SaleType'] if str(x) != 'nan']
     SaleType = {None: sum(sum_list) / len(sum_list)}
     df['SaleType'] = df['SaleType'].replace(to_replace=SaleType)
-    """
-
-    if True:
-        GarageAreaArray = df['GarageArea']
-        sum_not_nan = [x for x in range(len(GarageAreaArray)) if str(GarageAreaArray[x]) == 'nan']
-
-        # TODO ESEMPIO di sostituzione con media condizionata ai nan di GarageArea
+    
+         # TODO ESEMPIO di sostituzione con media condizionata ai nan di GarageArea
         GarageQual = {'Po': 1, 'Fa': 2, 'TA': 3, 'Gd': 4, 'Ex': 5}
         df['GarageQual'] = df['GarageQual'].replace(to_replace=GarageQual)
         if len(sum_not_nan) > 0:
@@ -263,15 +328,8 @@ def _read_file(filename):
             df['GarageQual'][sum_not_nan] = sum(sum_list) / len(sum_list)
         GarageQual = {None: 0}
         df['GarageQual'] = df['GarageQual'].replace(to_replace=GarageQual)
-
-        # TODO media condizionata
-        if len(sum_not_nan) > 0:
-            sum_list = [x for x in df['GarageYrBlt'] if str(x) != 'nan']
-            df['GarageYrBlt'][sum_not_nan] = sum(sum_list) / len(sum_list)
-        GarageYrBlt = {None: 0}
-        df['GarageYrBlt'] = df['GarageYrBlt'].replace(to_replace=GarageYrBlt)
-
-        # TODO media condizionata
+        
+          # TODO media condizionata
         GarageCond = {'Po': 1, 'Fa': 2, 'TA': 3, 'Gd': 4, 'Ex': 5}
         df['GarageCond'] = df['GarageCond'].replace(to_replace=GarageCond)
         if len(sum_not_nan) > 0:
@@ -279,6 +337,23 @@ def _read_file(filename):
             df['GarageCond'][sum_not_nan] = sum(sum_list) / len(sum_list)
         GarageCond = {None: 0}
         df['GarageCond'] = df['GarageCond'].replace(to_replace=GarageCond)
+        
+          # TODO media condizionata
+        GarageType = {'Detchd': 1, 'CarPort': 2, 'BuiltIn': 3, "Basment": 4, 'Attchd': 5, "2Types": 6}
+        df['GarageType'] = df['GarageType'].replace(to_replace=GarageType)
+        if len(sum_not_nan) > 0:
+            sum_list = [x for x in df['GarageType'] if str(x) != 'nan']
+            df['GarageType'][sum_not_nan] = sum(sum_list) / len(sum_list)
+        GarageType = {None: 0}
+        df['GarageType'] = df['GarageType'].replace(to_replace=GarageType)
+        
+          # TODO media condizionata
+        if len(sum_not_nan) > 0:
+            sum_list = [x for x in df['GarageYrBlt'] if str(x) != 'nan']
+            df['GarageYrBlt'][sum_not_nan] = sum(sum_list) / len(sum_list)
+        GarageYrBlt = {None: 0}
+        df['GarageYrBlt'] = df['GarageYrBlt'].replace(to_replace=GarageYrBlt)
+
 
         # TODO media condizionata
         GarageFinish = {'Unf': 1, 'RFn': 2, 'Fin': 3}
@@ -288,16 +363,8 @@ def _read_file(filename):
             df['GarageFinish'][sum_not_nan] = sum(sum_list) / len(sum_list)
         GarageFinish = {None: 0}
         df['GarageFinish'] = df['GarageFinish'].replace(to_replace=GarageFinish)
-
-        # TODO media condizionata
-        GarageType = {'Detchd': 1, 'CarPort': 2, 'BuiltIn': 3, "Basment": 4, 'Attchd': 5, "2Types": 6}
-        df['GarageType'] = df['GarageType'].replace(to_replace=GarageType)
-        if len(sum_not_nan) > 0:
-            sum_list = [x for x in df['GarageType'] if str(x) != 'nan']
-            df['GarageType'][sum_not_nan] = sum(sum_list) / len(sum_list)
-        GarageType = {None: 0}
-        df['GarageType'] = df['GarageType'].replace(to_replace=GarageType)
-
+        
+        
         sum_list = [x for x in df['GarageCars'] if str(x) != 'nan']
         GarageCars = {None: sum(sum_list) / len(sum_list)}
         df['GarageCars'] = df['GarageCars'].replace(to_replace=GarageCars)
@@ -305,7 +372,11 @@ def _read_file(filename):
         sum_list = [x for x in df['GarageArea'] if str(x) != 'nan']
         GarageArea = {None: sum(sum_list) / len(sum_list)}
         df['GarageArea'] = df['GarageArea'].replace(to_replace=GarageArea)
-
+        
+         GarageAreaArray = df['GarageArea']
+        sum_not_nan = [x for x in range(len(GarageAreaArray)) if str(GarageAreaArray[x]) == 'nan']
+        
+        
         # TODO media solo dove PoolArea != 0
         PoolQCArray = df['PoolQC']
         sum_not_nan = [x for x in range(len(PoolQCArray)) if str(PoolQCArray[x]) != 'nan']
@@ -318,23 +389,5 @@ def _read_file(filename):
             df['PoolQC'][sum_not_zero] = sum(sum_list) / len(sum_list)
         PoolQC = {None: 0}
         df['PoolQC'] = df['PoolQC'].replace(to_replace=PoolQC)
-
-        Fence = {None: 0, 'MnWw': 1, 'GdWo': 2, 'MnPrv': 3, 'GdPrv': 4}
-        df['Fence'] = df['Fence'].replace(to_replace=Fence)
-
-    if True:
-
-        #farei la media ma solo con quelli non finiti, ok?
-        BsmtUnfSF = {None: 0}
-        df['BsmtUnfSF'] = df['BsmtUnfSF'].replace(to_replace=BsmtUnfSF)
-
-        #faccio la media con tutti?
-        TotalBsmtSF = {None: 0}
-        df['TotalBsmtSF'] = df['TotalBsmtSF'].replace(to_replace=TotalBsmtSF)
-        BsmtFullBath = {None: 0}
-        df['BsmtFullBath'] = df['BsmtFullBath'].replace(to_replace=BsmtFullBath)
-        BsmtHalfBath = {None: 0}
-        df['BsmtHalfBath'] = df['BsmtHalfBath'].replace(to_replace=BsmtHalfBath)
-
-
+    """
     return df
