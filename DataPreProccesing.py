@@ -38,12 +38,15 @@ def _condition_and_encode(df, column_name, columns_to_check, values_to_check):
                     found = True
             if not found:
                 total_list.append(col)
-    lines_to_modify = [x for x in df[column_name] if str(x) == 'nan' and x not in total_list]
-    if len(lines_to_modify) > 0:
+
+    lines_to_set_mean = [x for x in df[column_name].index if str(df.iloc[x][column_name]) == 'nan' and x not in total_list]
+    lines_to_set_zero = [x for x in df[column_name].index if str(df.iloc[x][column_name]) == 'nan' and x not in lines_to_set_mean]
+
+    if len(lines_to_set_mean) > 0:
         sum_list = [x for x in df[column_name] if str(x) != 'nan']
-        df[column_name][lines_to_modify] = sum(sum_list) / len(sum_list)
-    if len(total_list) > 0:
-        df[total_list][column_name] = 0
+        df[column_name][lines_to_set_mean] = sum(sum_list) / len(sum_list)
+    if len(lines_to_set_zero) > 0:
+        df[column_name][lines_to_set_zero] = 0
     return df
 
 def _condition_or_encode(df, column_name, columns_to_check, values_to_check):
@@ -59,27 +62,16 @@ def _condition_or_encode(df, column_name, columns_to_check, values_to_check):
                     total_list.append(r)
     #TODO check all the combination of presence
     #TODO check the mean of the percentage of unfinished
-    lines_to_modify = [x for x in df[column_name] if str(x) == 'nan' and x not in total_list]
-    if len(lines_to_modify) > 0:
-        df[lines_to_modify][column_name] = 0
-    if len(total_list) > 0:
+
+    lines_to_set_zero = [x for x in df[column_name].index if str(df.iloc[x][column_name]) == 'nan' and x not in total_list]
+    lines_to_set_mean = [x for x in df[column_name] if str(x) == 'nan' and x not in lines_to_set_zero]
+
+    if len(lines_to_set_zero) > 0:
+        df[column_name][lines_to_set_zero]= 0
+    if len(lines_to_set_mean) > 0:
         sum_list = [x for x in df[column_name] if str(x) != 'nan']
-        df[column_name][total_list] = sum(sum_list) / len(sum_list)
+        df[column_name][lines_to_set_mean] = sum(sum_list) / len(sum_list)
     return df
-
-def _pool_encode(df, column_name, column_to_check):
-    data_to_check = df[column_to_check]
-    actual_col = df[column_name]
-    list_index = [x for x in data_to_check.index if data_to_check[x] == 0 and str(actual_col[x]) == "nan"]
-    df[list_index][column_name] = "NA"
-    return _data_encode(_avarage_and_encode(df, column_name))
-
-def _kitchen_encode(df, column_name, column_to_check):
-    data_to_check = df[column_to_check]
-    actual_col = df[column_name]
-    list_index = [x for x in data_to_check.index if data_to_check[x] == 0 and str(actual_col[x]) == "nan"]
-    df[list_index][column_name] = "NA"
-    return _data_encode(_avarage_and_encode(df, column_name))
 
 def _min_and_encode(df, column_name, columns_to_check, values_to_check):
     list_index = list()
@@ -92,22 +84,35 @@ def _min_and_encode(df, column_name, columns_to_check, values_to_check):
             for r in col:
                 if r not in total_list:
                     total_list.append(r)
-    #TODO check all the combination of presence
-    #TODO check the mean of the percentage of unfinished
-    lines_to_modify = [x for x in df[column_name] if str(x) == 'nan' and x not in total_list]
-    if len(lines_to_modify) > 0:
+    lines_to_set_mean = [x for x in df[column_name] if str(x) == 'nan' and x not in total_list]
+    lines_to_set_min = [x for x in df[column_name] if str(x) == 'nan' and x not in lines_to_set_mean]
+    if len(lines_to_set_mean) > 0:
         sum_list = [x for x in df[column_name] if str(x) != 'nan']
-        df[column_name][lines_to_modify] = sum(sum_list) / len(sum_list)
-    if len(total_list) > 0:
-        df[total_list][column_name] = df[column_name].min()
+        df[column_name][lines_to_set_mean] = sum(sum_list) / len(sum_list)
+    if len(lines_to_set_min) > 0:
+        df[column_name][lines_to_set_min] = df[column_name].min()
     return df
+
+def _pool_encode(df, column_name, column_to_check):
+    data_to_check = df[column_to_check]
+    actual_col = df[column_name]
+    list_index = [x for x in data_to_check.index if data_to_check[x] == 0 and str(actual_col[x]) == "nan"]
+    df[column_name][list_index] = "NA"
+    return _data_encode(_avarage_and_encode(df, column_name))
+
+def _kitchen_encode(df, column_name, column_to_check):
+    data_to_check = df[column_to_check]
+    actual_col = df[column_name]
+    list_index = [x for x in data_to_check.index if data_to_check[x] == 0 and str(actual_col[x]) == "nan"]
+    df[column_name][list_index] = "NA"
+    return _data_encode(_avarage_and_encode(df, column_name))
 
 def _read_file(filename):
     df = pd.read_csv(filename)
     df = df.drop('Id', axis=1)
 
     # if second field none => 0 otherwise mean
-    df = _condition_and_encode(df, 'MasVnrArea', ['MasVnrType'], [None])
+    df = _condition_and_encode(df, 'MasVnrArea', ['MasVnrType'], ["None"])
     df = _condition_and_encode(df, 'BsmtFinSF1', ['BsmtFinType1'], [None])
     df = _condition_and_encode(df, 'BsmtFinSF2', ['BsmtFinType2'], [None])
     df = _condition_and_encode(df, 'TotalBsmtSF', ['BsmtFinType1','BsmtFinType2'], [None, None])
