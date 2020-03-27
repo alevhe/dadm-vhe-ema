@@ -24,6 +24,12 @@ def _value_and_encode(df, column_name):
     df[column_name] = df[column_name].replace(to_replace=replacement)
     return _data_encode(df, column_name)
 
+#TODO
+def _ifnan_and_avarage(df, column_name, column_to_check):
+    sum_list = [x for x in df['MasVnrArea'] if str(x) != 'nan']
+    MasVnrArea = {None: sum(sum_list) / len(sum_list)}
+    df['MasVnrArea'] = df['MasVnrArea'].replace(to_replace=MasVnrArea)
+
 def _read_file(filename):
     df = pd.read_csv(filename)
     df = df.drop('Id', axis=1)
@@ -69,6 +75,11 @@ def _read_file(filename):
     df = _data_encode(df, 'RoofStyle')
     df = _data_encode(df, 'RoofMatl')
 
+    # if second field none => 0 otherwise mean
+    df = _ifnan_and_avarage(df, 'MasVnrArea', 'MasVnrType')
+    df = _ifnan_and_avarage(df, 'BsmtFinSF1', 'BsmtFinType1')
+    df = _ifnan_and_avarage(df, 'BsmtFinSF2', 'BsmtFinType2')
+
     #se non c'è vuol dire che è 0 giusto?
     LotFrontage = {None: 0}
     df['LotFrontage'] = df['LotFrontage'].replace(to_replace=LotFrontage)
@@ -79,10 +90,8 @@ def _read_file(filename):
     Street = {'Grvl': 0, 'Pave': 1}
     df['Street'] = df['Street'].replace(to_replace=Street)
 
-    #faccio le media sugli interi. si può fare in modo diverso (es usando masvnrtype?)
-    sum_list = [x for x in df['MasVnrArea'] if str(x) != 'nan']
-    MasVnrArea = {None: sum(sum_list) / len(sum_list)}
-    df['MasVnrArea'] = df['MasVnrArea'].replace(to_replace=MasVnrArea)
+    # se masvnrtpe=none => 0 otherwise mean(?)
+
 
     """    
         BsmtFinType2 = {None: 0, 'Unf': 1, 'LwQ': 2, "Rec": 3, 'BLQ': 4, 'ALQ': 5, 'GLQ': 6}
@@ -100,7 +109,9 @@ def _read_file(filename):
         BsmtQual = {None: 0, 'Po': 1, 'Fa': 2, 'TA': 3, 'Gd': 4, 'Ex': 5}
         df['BsmtQual'] = df['BsmtQual'].replace(to_replace=BsmtQual)
 
-    #TODO ESEMPIO di sostituzione con media
+
+
+       #TODO ESEMPIO di sostituzione con media
     MSZonind =  {'A': 1, 'C (all)': 2, 'C': 2, 'FV': 3, 'I': 4, 'RH': 5, 'RL': 6, 'RP': 7, 'RM': 8}
     df['MSZoning'] = df['MSZoning'].replace(to_replace=MSZonind)
     sum_list = [x for x in df['MSZoning'] if str(x) != 'nan']
@@ -312,11 +323,6 @@ def _read_file(filename):
         df['Fence'] = df['Fence'].replace(to_replace=Fence)
 
     if True:
-        #farei la media matematica
-        BsmtFinSF1 = {None: 0}
-        df['BsmtFinSF1'] = df['BsmtFinSF1'].replace(to_replace=BsmtFinSF1)
-        BsmtFinSF2 = {None: 0}
-        df['BsmtFinSF2'] = df['BsmtFinSF2'].replace(to_replace=BsmtFinSF2)
 
         #farei la media ma solo con quelli non finiti, ok?
         BsmtUnfSF = {None: 0}
