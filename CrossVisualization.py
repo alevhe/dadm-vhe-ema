@@ -10,7 +10,7 @@ if __name__ == '__main__':
     # Variable of the execution
     testing_size = 0.2
     folds = 4
-    PlotFolder = "CrossData"
+    PlotFolder = "GoodCrossData"
     ls_input = "LS-"+str(testing_size)+"-"+str(folds)+".txt"
     rls_input = "RLS-"+str(testing_size)+"-"+str(folds)+".txt"
     krls_input = "KRLS-"+str(testing_size)+"-"+str(folds)+".txt"

@@ -1,29 +1,33 @@
 import getopt
 import sys
 from numpy import logspace
+import time
+from datetime import datetime
 
 from sklearn.linear_model import LinearRegression, Ridge
 from sklearn.kernel_ridge import KernelRidge
 
 import DataPreProccesing
 import Estimator
+import warnings
 
 if __name__ == '__main__':
+    warnings.filterwarnings("ignore")
     #initialize the params
     filename = 'data/train.csv'#name of the fail to be trained
     y_column = 'SalePrice' #label of the results column
     testing_size = 0.2 #percentage of testing set over total
     folds = 4 #folds-1 train and the other test for folds time to try different params
     max_dimension = 10000 #the dataset is a subset of the dataset stored in file
-    montecarlo = 1 #number of repetitions for better accuracy
-    rls_n_lambda_to_try = 10 #number of lambda to try
+    montecarlo = 10 #number of repetitions for better accuracy
+    rls_n_lambda_to_try = 21 #number of lambda to try
     rls_min_lambda = -3 #exponent of 10, is the minimum value of lambda to try
     rls_max_lambda = 3  #exponent of 10, is the maximum value of lambda to try
-    kernel_list = ['rbf','poly','laplacian', 'chi2', 'linear', 'sigmoid'] #list of the kernel to be used
-    krls_n_lambda_to_try = 10 #number of lambda to try
+    kernel_list = ['rbf','poly','laplacian', 'chi2', 'linear'] #list of the kernel to be used
+    krls_n_lambda_to_try = 13 #number of lambda to try
     krls_min_lambda = -4 #exponent of 10, is the minimum value of lambda to try
     krls_max_lambda = 1  #exponent of 10, is the maximum value of lambda to try
-    krls_n_gamma_to_try = 10 #number of gamma to try
+    krls_n_gamma_to_try = 13 #number of gamma to try
     krls_min_gamma = -4 #exponent of 10, is the minimum value of gamma to try
     krls_max_gamma = 1  #exponent of 10, is the maximum value of gamma to try
     printResults = True #if to print results at the end
@@ -115,6 +119,7 @@ if __name__ == '__main__':
     best_rls = None
     best_krls = None
 
+    big_ben = time.time()
     #read the dataset only the first time (I doesn't change)
     print('Reading dataset...')
     df = DataPreProccesing._read_file(filename).iloc[:max_dimension]
@@ -132,14 +137,20 @@ if __name__ == '__main__':
         rls_test_results = list()
         krls_test_results = list()
 
-        print('%d - Preparing dataset...' % attempt)
+        print(
+            '%.2f - %s - %d - Preparing dataset...' % (
+            time.time() - big_ben, datetime.now().strftime("%H:%M:%S"), attempt))
         #obtain 4 different matrix (x-train, x-test, y-train, y-test)
         xtr, xts, ytr, yts = Estimator.normalize_set(df, y_column, ts_size=testing_size)
 
         # LS algorithm
-        print('%d - Training LS...' % attempt)
+        print(
+            '%.2f - %s - %d - Training LS...' % (
+            time.time() - big_ben, datetime.now().strftime("%H:%M:%S"), attempt))
         ls = Estimator.train_estimator(LinearRegression(), xtr, ytr, params={}, folds=folds)
-        print('%d - Testing LS...' % attempt)
+        print(
+            '%.2f - %s - %d - Testing LS...' % (
+            time.time() - big_ben, datetime.now().strftime("%H:%M:%S"), attempt))
         ls_score, ls_score_2 = Estimator.test_estimator(ls, xts, yts)
         if saveResults:
             ls_test_results.append(ls_score_2)
@@ -152,10 +163,14 @@ if __name__ == '__main__':
 
         # RLS algorithm
         rls_params = {'alpha': logspace(rls_min_lambda, rls_max_lambda, rls_n_lambda_to_try)}
-        print('%d - Training RLS...' % attempt)
+        print(
+            '%.2f - %s - %d - Training RLS...' % (
+                time.time() - big_ben, datetime.now().strftime("%H:%M:%S"), attempt))
         # solver='auto' different methods for the computational routines based on the data types
         rls = Estimator.train_estimator(Ridge(solver='auto'), xtr, ytr, rls_params, folds=folds)
-        print('%d - Testing RLS...' % attempt)
+        print(
+            '%.2f - %s - %d - Testing RLS...' % (
+                time.time() - big_ben, datetime.now().strftime("%H:%M:%S"), attempt))
         rls_score, rls_score_2 = Estimator.test_estimator(rls, xts, yts)
         if saveResults:
             rls_test_results.append(rls_score_2)
@@ -175,10 +190,13 @@ if __name__ == '__main__':
             'alpha': logspace(krls_min_lambda, krls_max_lambda, krls_n_lambda_to_try),
             'gamma': logspace(krls_min_gamma, krls_max_gamma, krls_n_gamma_to_try)
         }
-
-        print('%d - Training KRLS...' % attempt)
+        print(
+            '%.2f - %s - %d - Training KRLS...' % (
+                time.time() - big_ben, datetime.now().strftime("%H:%M:%S"), attempt))
         krls = Estimator.train_estimator(KernelRidge(), xtr, ytr, krls_params, folds=folds)
-        print('%d - Testing KRLS...' % attempt)
+        print(
+            '%.2f - %s - %d - Testing KRLS...' % (
+                time.time() - big_ben, datetime.now().strftime("%H:%M:%S"), attempt))
         krls_score, krls_score_2 = Estimator.test_estimator(krls, xts, yts)
         if saveResults:
             krls_test_results.append(krls_score_2)
