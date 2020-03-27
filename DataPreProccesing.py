@@ -13,7 +13,7 @@ def _data_encode(df, column_name):
     return df
 
 # missing completely at random
-def _avarage_and_encode(df, column_name):
+def _average_and_encode(df, column_name):
     #replacement = {None: "NA"}
     #df[column_name] = df[column_name].replace(to_replace=replacement)
     return _data_encode(df, column_name)
@@ -64,7 +64,7 @@ def _condition_or_encode(df, column_name, columns_to_check, values_to_check):
     #TODO check the mean of the percentage of unfinished
 
     lines_to_set_zero = [x for x in df[column_name].index if str(df.iloc[x][column_name]) == 'nan' and x not in total_list]
-    lines_to_set_mean = [x for x in df[column_name] if str(x) == 'nan' and x not in lines_to_set_zero]
+    lines_to_set_mean = [x for x in df[column_name].index if str(df.iloc[x][column_name]) == 'nan' and x not in lines_to_set_zero]
 
     if len(lines_to_set_zero) > 0:
         df[column_name][lines_to_set_zero]= 0
@@ -84,8 +84,8 @@ def _min_and_encode(df, column_name, columns_to_check, values_to_check):
             for r in col:
                 if r not in total_list:
                     total_list.append(r)
-    lines_to_set_mean = [x for x in df[column_name] if str(x) == 'nan' and x not in total_list]
-    lines_to_set_min = [x for x in df[column_name] if str(x) == 'nan' and x not in lines_to_set_mean]
+    lines_to_set_mean = [x for x in df[column_name].index if str(df.iloc[x][column_name]) == 'nan' and x not in total_list]
+    lines_to_set_min = [x for x in df[column_name].index if str(df.iloc[x][column_name]) == 'nan' and x not in lines_to_set_mean]
     if len(lines_to_set_mean) > 0:
         sum_list = [x for x in df[column_name] if str(x) != 'nan']
         df[column_name][lines_to_set_mean] = sum(sum_list) / len(sum_list)
@@ -98,14 +98,14 @@ def _pool_encode(df, column_name, column_to_check):
     actual_col = df[column_name]
     list_index = [x for x in data_to_check.index if data_to_check[x] == 0 and str(actual_col[x]) == "nan"]
     df[column_name][list_index] = "NA"
-    return _data_encode(_avarage_and_encode(df, column_name))
+    return _average_and_encode(df, column_name)
 
 def _kitchen_encode(df, column_name, column_to_check):
     data_to_check = df[column_to_check]
     actual_col = df[column_name]
     list_index = [x for x in data_to_check.index if data_to_check[x] == 0 and str(actual_col[x]) == "nan"]
     df[column_name][list_index] = "NA"
-    return _data_encode(_avarage_and_encode(df, column_name))
+    return _average_and_encode(df, column_name)
 
 def _read_file(filename):
     df = pd.read_csv(filename)
@@ -127,17 +127,17 @@ def _read_file(filename):
 
 
     # the following fields were the following of which we took the mean
-    df = _avarage_and_encode(df, 'SaleType')
-    df = _avarage_and_encode(df, 'ExterCond')
-    df = _avarage_and_encode(df, 'ExterQual')
-    df = _avarage_and_encode(df, 'MasVnrType')
-    df = _avarage_and_encode(df, 'Exterior1st')
-    df = _avarage_and_encode(df, 'Exterior2nd')
-    df = _avarage_and_encode(df, 'Utilities')
-    df = _avarage_and_encode(df, 'MSZoning')
-    df = _avarage_and_encode(df, 'Functional')
-    df = _kitchen_encode(df, 'KitchenQual', 'Kitchen')
-    df = _avarage_and_encode(df, 'Electrical')
+    df = _average_and_encode(df, 'SaleType')
+    df = _average_and_encode(df, 'ExterCond')
+    df = _average_and_encode(df, 'ExterQual')
+    df = _average_and_encode(df, 'MasVnrType')
+    df = _average_and_encode(df, 'Exterior1st')
+    df = _average_and_encode(df, 'Exterior2nd')
+    df = _average_and_encode(df, 'Utilities')
+    df = _average_and_encode(df, 'MSZoning')
+    df = _average_and_encode(df, 'Functional')
+    df = _kitchen_encode(df, 'KitchenQual', 'KitchenAbvGr')
+    df = _average_and_encode(df, 'Electrical')
 
     # the following fields maintain the nan as zero
     df = _value_and_encode(df, 'Alley')
@@ -175,7 +175,7 @@ def _read_file(filename):
     df = _data_encode(df, 'RoofStyle')
     df = _data_encode(df, 'RoofMatl')
 
-    df = _pool_encode(df, 'PoolQc', 'PoolArea')
+    df = _pool_encode(df, 'PoolQC', 'PoolArea')
 
     #se non c'è vuol dire che è 0 giusto?
     LotFrontage = {None: 0}

@@ -15,16 +15,16 @@ if __name__ == '__main__':
     withLS = False
     withRLS = False
     withKRLS = True
-    l2 = True  # if to normalize with l2
+    l2 = False  # if to normalize with l2
     folds = 4
     rls_n_lambda_to_try = 8  # number of lambda to try
     rls_min_lambda = -3  # exponent of 10, is the minimum value of lambda to try
     rls_max_lambda = 1  # exponent of 10, is the maximum value of lambda to try
-    kernel_list = ['laplacian']  # list of the kernel to be used
-    krls_n_lambda_to_try = 10  # number of lambda to try
+    kernel_list = ['laplacian','rbf','poly']  # list of the kernel to be used
+    krls_n_lambda_to_try = 100  # number of lambda to try
     krls_min_lambda = -3  # exponent of 10, is the minimum value of lambda to try
     krls_max_lambda = 2  # exponent of 10, is the maximum value of lambda to try
-    krls_n_gamma_to_try = 10  # number of gamma to try
+    krls_n_gamma_to_try = 100  # number of gamma to try
     krls_min_gamma = -3 # exponent of 10, is the minimum value of gamma to try
     krls_max_gamma = -2  # exponent of 10, is the maximum value of gamma to try
 
@@ -79,7 +79,7 @@ if __name__ == '__main__':
         krls_result = krls.predict(test)
         print("Predicted")
         #DataFrame construction for Kaggle
-        file_output = open("Output/output.csv", "w")
+        file_output = open("Output/outputnol2.csv", "w")
         file_output.write("Id,SalePrice\n")
         for res in range(len(krls_result)):
             file_output.write(str(1461+res)+","+str(krls_result[res])+"\n")
