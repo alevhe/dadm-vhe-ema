@@ -7,7 +7,7 @@ from datetime import datetime
 from sklearn.linear_model import LinearRegression, Ridge
 from sklearn.kernel_ridge import KernelRidge
 
-import DataPreProccesing
+import DataPreProccesingCat
 import Estimator
 import warnings
 
@@ -122,7 +122,7 @@ if __name__ == '__main__':
     big_ben = time.time()
     #read the dataset only the first time (I doesn't change)
     print('Reading dataset...')
-    df = DataPreProccesing._read_file(filename).iloc[:max_dimension]
+    df = DataPreProccesingCat._read_file(filename).iloc[:max_dimension]
 
     #for all the attempts
     for attempt in range(montecarlo):

@@ -4,7 +4,7 @@ import pandas as pd
 from sklearn.linear_model import LinearRegression, Ridge
 from sklearn.kernel_ridge import KernelRidge
 from sklearn.preprocessing import normalize
-import DataPreProccesing
+import DataPreProccesingCat
 import Estimator
 
 if __name__ == '__main__':
@@ -30,8 +30,8 @@ if __name__ == '__main__':
 
     #read the dataset only the first time (I doesn't change)
     print('Reading dataset...')
-    test = DataPreProccesing._read_file(test_filename)
-    df = DataPreProccesing._read_file(input_filename)
+    test = DataPreProccesingCat._read_file(test_filename)
+    df = DataPreProccesingCat._read_file(input_filename)
 
     x_first = df.loc[:, df.columns != y_column]
     ytr = df[y_column]
@@ -42,8 +42,8 @@ if __name__ == '__main__':
     test_to_add = [x for x in x_c if x not in test_c]
     x_to_add = [x for x in test_c if x not in x_c]
 
-    x_first = DataPreProccesing._add_columns(x_first, x_to_add)
-    test = DataPreProccesing._add_columns(test, test_to_add)
+    x_first = DataPreProccesingCat._add_columns(x_first, x_to_add)
+    test = DataPreProccesingCat._add_columns(test, test_to_add)
 
     x_col = x_first.columns
     test = test.iloc[test.index][x_col]
