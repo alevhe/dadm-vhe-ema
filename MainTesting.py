@@ -15,18 +15,18 @@ if __name__ == '__main__':
     withLS = False
     withRLS = False
     withKRLS = True
-    l2 = False  # if to normalize with l2
-    folds = 4
+    l2 = True  # if to normalize with l2
+    folds = 3
     rls_n_lambda_to_try = 8  # number of lambda to try
     rls_min_lambda = -2  # exponent of 10, is the minimum value of lambda to try
     rls_max_lambda = 1  # exponent of 10, is the maximum value of lambda to try
     kernel_list = ['laplacian']  # list of the kernel to be used
     krls_n_lambda_to_try = 10  # number of lambda to try
     krls_min_lambda = -2  # exponent of 10, is the minimum value of lambda to try
-    krls_max_lambda = -1  # exponent of 10, is the maximum value of lambda to try
+    krls_max_lambda = -1.2  # exponent of 10, is the maximum value of lambda to try
     krls_n_gamma_to_try = 10  # number of gamma to try
-    krls_min_gamma = -2 # exponent of 10, is the minimum value of gamma to try
-    krls_max_gamma = 0  # exponent of 10, is the maximum value of gamma to try
+    krls_min_gamma = -1.3 # exponent of 10, is the minimum value of gamma to try
+    krls_max_gamma = 0.7  # exponent of 10, is the maximum value of gamma to try
 
     #read the dataset only the first time (I doesn't change)
     print('Reading dataset...')
@@ -47,7 +47,7 @@ if __name__ == '__main__':
 
     x_col = x_first.columns
     test = test.iloc[test.index][x_col]
-    
+
     if not l2:
         val = x_first.values
         min_max_scaler = preprocessing.MinMaxScaler()

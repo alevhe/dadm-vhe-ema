@@ -24,11 +24,13 @@ def _value_and_encode(df, column_name):
     df[column_name] = df[column_name].replace(to_replace=replacement)
     return _data_encode(df, column_name)
 
-def _condition_and_encode(df, column_name, columns_to_check, values_to_check):
+
+#set 0 because they are values
+def _garage_and_encode(df, columns_to_check):
     list_index = list()
     for column_id in range(len(columns_to_check)):
         data_to_check = df[columns_to_check[column_id]]
-        list_index.append([x for x in data_to_check.index if data_to_check[x] == values_to_check[column_id]])
+        list_index.append([x for x in data_to_check.index if str(data_to_check[x]) == "nan"])
     total_list = list()
     if len(list_index) > 0:
         for col in list_index[0]:
@@ -38,6 +40,51 @@ def _condition_and_encode(df, column_name, columns_to_check, values_to_check):
                     found = True
             if not found:
                 total_list.append(col)
+    total_list_or = list()
+    if len(list_index) > 0:
+        for col in list_index:
+            for r in col:
+                if r not in total_list_or:
+                    total_list_or.append(r)
+    lines_to_modify = [x for x in total_list_or if x in total_list]
+
+    for c in columns_to_check:
+        df[c][lines_to_modify] = "Na"
+        df = _data_encode(df, c)
+    return df
+
+def _condition_and_encode(df, column_name, columns_to_check):
+    list_index = list()
+    for column_id in range(len(columns_to_check)):
+        data_to_check = df[columns_to_check[column_id]]
+        list_index.append([x for x in data_to_check.index if str(data_to_check[x]) == "nan"])
+    total_list = list()
+    if len(list_index) > 0:
+        for col in list_index[0]:
+            found = False
+            for row in list_index:
+                if col not in row:
+                    found = True
+            if not found:
+                total_list.append(col)
+
+    lines_to_set_mean = [x for x in df[column_name].index if str(df.iloc[x][column_name]) == 'nan' and x in total_list]
+    lines_to_set_zero = [x for x in df[column_name].index if str(df.iloc[x][column_name]) == 'nan' and x not in lines_to_set_mean]
+
+    if len(lines_to_set_mean) > 0:
+        sum_list = [x for x in df[column_name] if str(x) != 'nan']
+        df[column_name][lines_to_set_mean] = sum(sum_list) / len(sum_list)
+        if column_name == 'BsmtFinSF1' or column_name == 'BsmtFinSF2':
+            tl = [x for x in total_list if x not in lines_to_set_mean]
+            df[columns_to_check[0]][tl] = "NA"
+    if len(lines_to_set_zero) > 0:
+        df[column_name][lines_to_set_zero] = 0
+    return df
+
+def _masvnr_and_encode(df):
+    column_name = "MasVnrArea"
+    data_to_check = df["MasVnrType"]
+    total_list = [x for x in data_to_check.index if data_to_check[x] == "None"]
 
     lines_to_set_mean = [x for x in df[column_name].index if str(df.iloc[x][column_name]) == 'nan' and x not in total_list]
     lines_to_set_zero = [x for x in df[column_name].index if str(df.iloc[x][column_name]) == 'nan' and x not in lines_to_set_mean]
@@ -49,11 +96,12 @@ def _condition_and_encode(df, column_name, columns_to_check, values_to_check):
         df[column_name][lines_to_set_zero] = 0
     return df
 
+
 def _condition_or_encode(df, column_name, columns_to_check, values_to_check):
     list_index = list()
     for column_id in range(len(columns_to_check)):
         data_to_check = df[columns_to_check[column_id]]
-        list_index.append([x for x in data_to_check.index if data_to_check[x] == values_to_check[column_id]])
+        list_index.append([x for x in data_to_check.index if str(data_to_check[x]) == values_to_check[column_id]])
     total_list = list()
     if len(list_index) > 0:
         for col in list_index:
@@ -73,18 +121,43 @@ def _condition_or_encode(df, column_name, columns_to_check, values_to_check):
         df[column_name][lines_to_set_mean] = sum(sum_list) / len(sum_list)
     return df
 
-def _min_and_encode(df, column_name, columns_to_check, values_to_check):
+def _condition_or_encode_bsmt(df, column_name, columns_to_check, values_to_check):
     list_index = list()
     for column_id in range(len(columns_to_check)):
         data_to_check = df[columns_to_check[column_id]]
-        list_index.append([x for x in data_to_check.index if data_to_check[x] == values_to_check[column_id]])
+        list_index.append([x for x in data_to_check.index if
+                       str(data_to_check[x]) == values_to_check[column_id] or str(data_to_check[x]) == "nan"])
     total_list = list()
     if len(list_index) > 0:
         for col in list_index:
             for r in col:
                 if r not in total_list:
                     total_list.append(r)
-    lines_to_set_mean = [x for x in df[column_name].index if str(df.iloc[x][column_name]) == 'nan' and x not in total_list]
+    #TODO check all the combination of presence
+    #TODO check the mean of the percentage of unfinished
+
+    lines_to_set_zero = [x for x in df[column_name].index if str(df.iloc[x][column_name]) == 'nan' and x not in total_list]
+    lines_to_set_mean = [x for x in df[column_name].index if str(df.iloc[x][column_name]) == 'nan' and x not in lines_to_set_zero]
+
+    if len(lines_to_set_zero) > 0:
+        df[column_name][lines_to_set_zero]= 0
+    if len(lines_to_set_mean) > 0:
+        sum_list = [x for x in df[column_name] if str(x) != 'nan']
+        df[column_name][lines_to_set_mean] = sum(sum_list) / len(sum_list)
+    return df
+
+def _min_and_encode(df, column_name, columns_to_check):
+    list_index = list()
+    for column_id in range(len(columns_to_check)):
+        data_to_check = df[columns_to_check[column_id]]
+        list_index.append([x for x in data_to_check.index if str(data_to_check[x]) == "nan"])
+    total_list = list()
+    if len(list_index) > 0:
+        for col in list_index:
+            for r in col:
+                if r not in total_list:
+                    total_list.append(r)
+    lines_to_set_mean = [x for x in df[column_name].index if str(df.iloc[x][column_name]) == 'nan' and x  in total_list]
     lines_to_set_min = [x for x in df[column_name].index if str(df.iloc[x][column_name]) == 'nan' and x not in lines_to_set_mean]
     if len(lines_to_set_mean) > 0:
         sum_list = [x for x in df[column_name] if str(x) != 'nan']
@@ -112,18 +185,20 @@ def _read_file(filename):
     df = df.drop('Id', axis=1)
 
     # if second field none => 0 otherwise mean
-    df = _condition_and_encode(df, 'MasVnrArea', ['MasVnrType'], ["None"])
-    df = _condition_and_encode(df, 'BsmtFinSF1', ['BsmtFinType1'], [None])
-    df = _condition_and_encode(df, 'BsmtFinSF2', ['BsmtFinType2'], [None])
-    df = _condition_and_encode(df, 'TotalBsmtSF', ['BsmtFinType1','BsmtFinType2'], [None, None])
-    df = _condition_and_encode(df, 'BsmtFullBath', ['BsmtFinType1', 'BsmtFinType2'], [None, None])
-    df = _condition_and_encode(df, 'BsmtHalfBath', ['BsmtFinType1', 'BsmtFinType2'], [None, None])
-    df = _condition_and_encode(df, 'GarageCars', ['GarageType', 'GarageCond', 'GarageQual'], [None, None, None])
-    df = _condition_and_encode(df, 'GarageArea', ['GarageType', 'GarageCond', 'GarageQual'], [None, None, None])
+    df = _masvnr_and_encode(df)
+    df = _condition_and_encode(df, 'BsmtFinSF1', ['BsmtFinType1'])
+    df = _condition_and_encode(df, 'BsmtFinSF2', ['BsmtFinType2'])
+    df = _condition_and_encode(df, 'TotalBsmtSF', ['BsmtFinType1','BsmtFinType2'])
+    df = _condition_and_encode(df, 'BsmtFullBath', ['BsmtFinType1', 'BsmtFinType2'])
+    df = _condition_and_encode(df, 'BsmtHalfBath', ['BsmtFinType1', 'BsmtFinType2'])
 
-    df = _condition_or_encode(df, 'BsmtUnfSF', ['BsmtFinType1', 'BsmtFinType2'], ['Unf', 'Unf'])
 
-    df = _min_and_encode(df, 'GarageYrBlt', ['GarageType', 'GarageCond', 'GarageQual'], [None, None, None])
+    df = _condition_or_encode(df, 'GarageCars', ['GarageType', 'GarageCond', 'GarageQual'], ['nan', 'nan', 'nan'])
+    df = _condition_or_encode(df, 'GarageArea', ['GarageType', 'GarageCond', 'GarageQual'], ['nan', 'nan', 'nan'])
+
+    df = _condition_or_encode_bsmt(df, 'BsmtUnfSF', ['BsmtFinType1', 'BsmtFinType2'], ['Unf', 'Unf'])
+
+    df = _min_and_encode(df, 'GarageYrBlt', ['GarageType', 'GarageCond', 'GarageQual'])
 
 
     # the following fields were the following of which we took the mean
@@ -138,21 +213,18 @@ def _read_file(filename):
     df = _average_and_encode(df, 'Functional')
     df = _kitchen_encode(df, 'KitchenQual', 'KitchenAbvGr')
     df = _average_and_encode(df, 'Electrical')
+    df = _average_and_encode(df, 'BsmtFinType1')
+    df = _average_and_encode(df, 'BsmtFinType2')
 
     # the following fields maintain the nan as zero
     df = _value_and_encode(df, 'Alley')
     df = _value_and_encode(df, 'FireplaceQu')
     df = _value_and_encode(df, 'MiscFeature')
-    df = _value_and_encode(df, 'BsmtFinType2')
-    df = _value_and_encode(df, 'BsmtFinType1')
     df = _value_and_encode(df, 'BsmtQual')
     df = _value_and_encode(df, 'BsmtCond')
     df = _value_and_encode(df, 'BsmtExposure')
     df = _value_and_encode(df, 'Fence')
-    df = _value_and_encode(df, 'GarageType')
-    df = _value_and_encode(df, 'GarageCond')
-    df = _value_and_encode(df, 'GarageQual')
-    df = _value_and_encode(df, 'GarageFinish')
+    df = _garage_and_encode(df, ['GarageType', 'GarageCond', 'GarageQual', 'GarageFinish'])
 
     #the following fields doon't expect to see nan
     df = _data_encode(df, 'MSSubClass')
@@ -181,10 +253,6 @@ def _read_file(filename):
     LotFrontage = {None: 0}
     df['LotFrontage'] = df['LotFrontage'].replace(to_replace=LotFrontage)
 
-    # tanto questi sono booleani
-    CentralAir = {'N': 0, 'Y': 1}
-    df['CentralAir'] = df['CentralAir'].replace(to_replace=CentralAir)
-    Street = {'Grvl': 0, 'Pave': 1}
-    df['Street'] = df['Street'].replace(to_replace=Street)
-
+    df = _data_encode(df, 'CentralAir')
+    df = _data_encode(df, 'Street')
     return df
