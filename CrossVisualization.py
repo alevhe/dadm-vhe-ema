@@ -16,7 +16,7 @@ if __name__ == '__main__':
     krls_input = "KRLS-"+str(testing_size)+"-"+str(folds)+".txt"
 
     #lower bound for the score when analyzing krls (because of the color scale)
-    limit_value_for_krls = 0.5
+    limit_value_for_krls = 0.6
 
     #limits for lambda (they allow to zoom areas)
     rls_min_lambda = 0.0001
@@ -27,6 +27,13 @@ if __name__ == '__main__':
     krls_max_lambda = 1000
     krls_min_gamma = 0.0001
     krls_max_gamma = 1000
+
+    """
+    krls_min_lambda = 10**-2
+    krls_max_lambda = 10**-1
+    krls_min_gamma = 10**-2.5
+    krls_max_gamma = 10**-1.5
+    """
 
     #color map for the kernel plots
     cmap = plt.plasma()

@@ -17,7 +17,7 @@ def normalize_set(df, y_col, ts_size):
 
 def train_estimator(estimator, xtr, ytr, params, folds, train_score=True):
     cv = KFold(n_splits=folds)
-    clf = GridSearchCV(estimator, params, cv=cv, return_train_score=train_score, n_jobs=-1)
+    clf = GridSearchCV(estimator, params, cv=cv, return_train_score=train_score, n_jobs=4)
     # the following line finds all the cuples of indexes where isnan
     #[i,j] = np.where(np.isnan(xtr))
     clf.fit(xtr, ytr)
