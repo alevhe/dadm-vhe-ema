@@ -21,7 +21,7 @@ if __name__ == '__main__':
     limit_value_for_krls = -85
 
     #limits for lambda (they allow to zoom areas)
-    rls_min_lambda = 0.0001
+    rls_min_lambda = 0.0012
     rls_max_lambda = 1000
 
     #limits for gamma (they allow to zoom areas)
@@ -124,17 +124,17 @@ if __name__ == '__main__':
     plt.plot(x, mts, color='r', linestyle='-', marker=".", markersize=5, label="mean test score")
     plt.xlabel("lambda")
     plt.ylabel("Mean score")
-    plt.title("RLS results - " + str(len(test))+" - " + str(testing_size) + " " + str(folds))
+    plt.title("RLS results - " + str(len(alpha))+" - " + str(testing_size) + " " + str(folds))
     plt.legend(frameon=False, loc='lower center')
-    plt.grid()
+    plt.grid(True,which="both",ls="-")
     plt.xscale("log")
 
     plt.subplot(2, 1, 2)
     plt.plot(x, occ, color='k', linestyle='-', marker=".", markersize=5)
     plt.xlabel("lambda")
     plt.ylabel("Occurences")
-    plt.title("RLS occurences - " + str(len(test)) + " - " + str(testing_size) + " " + str(folds))
-    plt.grid()
+    plt.title("RLS occurences - " + str(len(alpha)) + " - " + str(testing_size) + " " + str(folds))
+    plt.grid(True,which="both",ls="-")
     plt.xscale("log")
 
     plt.show()
@@ -260,7 +260,7 @@ if __name__ == '__main__':
 
 
         plt.subplot(2, 2, 1)
-        plt.title(kernel+" - Mean Train - "+str(len(test))+" - "+str(testing_size)+" "+str(folds))
+        plt.title(kernel+" - Mean Train - "+str(len(alpha))+" - "+str(testing_size)+" "+str(folds))
         plt.ylabel('gamma')
         plt.xlabel('lambda')
         points = plt.scatter(x, y, c=mtr, s=10, cmap=cmap)
@@ -269,7 +269,7 @@ if __name__ == '__main__':
         plt.xscale("log")
 
         plt.subplot(2, 2, 2)
-        plt.title(kernel + " - Mean Test - " + str(len(test)) + " - " + str(testing_size) + " " + str(folds))
+        plt.title(kernel + " - Mean Test - " + str(len(alpha)) + " - " + str(testing_size) + " " + str(folds))
         plt.ylabel('gamma')
         plt.xlabel('lambda')
         points = plt.scatter(x, y, c=mts, s=10, cmap=cmap)
@@ -278,7 +278,7 @@ if __name__ == '__main__':
         plt.xscale("log")
 
         plt.subplot(2, 2, 3)
-        plt.title(kernel + " - Occurences - " + str(len(test)) + " - " + str(testing_size) + " " + str(folds))
+        plt.title(kernel + " - Occurences - " + str(len(alpha)) + " - " + str(testing_size) + " " + str(folds))
         plt.ylabel('gamma')
         plt.xlabel('lambda')
         points = plt.scatter(x, y, c=occ, s=10, cmap=cmap)
@@ -287,7 +287,7 @@ if __name__ == '__main__':
         plt.xscale("log")
 
         plt.subplot(2, 2, 4)
-        plt.title(kernel + " - Test - " + str(len(test)) + " - " + str(testing_size) + " " + str(folds))
+        plt.title(kernel + " - Test - " + str(len(alpha)) + " - " + str(testing_size) + " " + str(folds))
         plt.ylabel('gamma')
         plt.xlabel('lambda')
         points = plt.scatter(x, y, c=test, s=10, cmap=cmap)

@@ -19,7 +19,7 @@ if __name__ == '__main__':
     testing_size = 0.2 #percentage of testing set over total
     folds = 4 #folds-1 train and the other test for folds time to try different params
     max_dimension = 10000 #the dataset is a subset of the dataset stored in file
-    montecarlo = 1 #number of repetitions for better accuracy
+    montecarlo = 100 #number of repetitions for better accuracy
     rls_n_lambda_to_try = 151 #number of lambda to try
     rls_min_lambda = -3 #exponent of 10, is the minimum value of lambda to try
     rls_max_lambda = 3  #exponent of 10, is the maximum value of lambda to try
