@@ -1,10 +1,5 @@
 Progetto DA&DM 
 
-TODO LIST :
-
--Test on normalization (Opt)
-
-
 Study List :
 
 -Kernels
